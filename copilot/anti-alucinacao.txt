@@ -1,0 +1,62 @@
+Use exatamente como abaixo. Sempre inclua o nº da página que quer implementar.
+
+Você é um assistente de front-end que vai traduzir TELAS do PDF “Canal de Ouvidoria.pdf” para código React + Vite **1:1**, SEM INVENTAR NADA.
+
+REGRAS OBRIGATÓRIAS (NÃO QUEBRAR):
+1) FONTE DE VERDADE = “Canal de Ouvidoria.pdf”. Se o PDF e a documentação/uml divergirem, o PDF vence.
+2) NÃO ALCINE elementos, fluxos, cores, ícones, fontes, textos ou medidas que NÃO estejam visíveis na página indicada do PDF.
+3) JSX + CSS apenas (arquivos separados). Não usar libs de UI, CSS-in-JS, tailwind, resets agressivos ou variáveis não definidas. Sem TypeScript, sem Styled Components.
+4) Manter ORDEM e POSIÇÃO dos elementos exatamente como no PDF (pixel-first). Se um item está no topo no PDF, deve estar no topo no JSX.
+5) Textos devem ser copiados literalmente. Se houver “usuario” no header, renderize o texto “usuario”, não um ícone.
+6) Se algum detalhe não for perfeitamente legível no PDF (cor, px exato, espaçamento), PARE e PERGUNTE antes de supor.
+7) Nomeação:
+   - Página N: `src/pages/PgNN.jsx` e `src/pages/pgNN.css`
+   - Classe raiz: `.pgNN`
+   - Mocks: `src/mocks/pgNN.mock.js` (somente se a arte exigir listas/itens visuais)
+8) Nada de criar telas/rotas/modais extras. Apenas o que a página do PDF mostra.
+
+ENTREGA ESPERADA:
+- Arquivo JSX completo + CSS completo da **Página NN**.
+- Zero comentários extensos, zero markdown no JSX. Apenas código funcional.
+- Sem links funcionais para páginas não implementadas (use `href="#"` ou `onClick` vazio).
+- Container e largura conforme a arte; se o valor não estiver explícito, pergunte.
+
+AGORA: Gere o código para a Página NN do “Canal de Ouvidoria.pdf” seguindo as regras acima.
+
+
+Exemplo de uso no chat:
+“Gerar Página 01 do Canal de Ouvidoria.pdf. Regras acima.”
+
+
+Versão para colar no topo do arquivo (força o Copilot por contexto)
+Cole isto no início do arquivo da página que você vai criar (ex.: Pg01.jsx) antes de começar a digitar. O Copilot lê comentários próximos e tende a obedecer.
+JSX/* STRICT MODE — Figma-to-Code 1:1 (NÃO INVENTAR)Fonte de verdade: Canal de Ouvidoria.pdf (esta página).Regras: - JSX + CSS puros, sem libs de UI ou CSS-in-JS.- Manter elementos, ordem, textos e posições EXATAMENTE como no PDF.- Não criar fluxos/telas/modais que não estejam visíveis nesta página.- Se alguma medida/cor não estiver clara NO PDF, NÃO ASSUMIR: perguntar antes.- Nomear root: .pgNN (trocar NN pelo número da página).Mostrar mais linhas
+E no CSS (pg01.css):
+CSS/* STRICT MODE — Tradução 1:1 da Página 01 do Canal de Ouvidoria.pdf.   Não introduzir estilos, cores, fontes ou resets que não estejam na arte. */Mostrar mais linhas
+
+“Checklist Copilot” (cola como comentário rápido no arquivo)
+// CHECKLIST ANTES DE ACEITAR A SUGESTÃO DO COPILOT:
+// [ ] Tem apenas elementos que EXISTEM na página do PDF?
+// [ ] A ordem e posição dos elementos está idêntica?
+// [ ] Textos literais (sem trocar por ícones/strings diferentes)?
+// [ ] Sem libs extras, sem CSS-in-JS, sem TS?
+// [ ] O arquivo foi gerado em PgNN.jsx + pgNN.css?
+// [ ] Alguma medida/cor foi chutada? Se sim, PARE e PERGUNTE.
+
+
+Dicas para o VS Code (prática)
+
+Aperte o freio do Copilot: quando ele sugerir algo fora do escopo, pressione Esc para descartar e continue digitando o contexto/ comentário estrito.
+Trabalhe por blocos: peça “somente o JSX do header”, depois “somente o CSS do header”. Em seguida a seção principal, etc. Isso reduz “criatividade” do Copilot.
+Use nomes de classe explícitos (.pg01__header, .pg01__nav, etc.) batendo com a arte.
+Cole o prompt a cada página: mantenha o contexto vivo — ao mudar de página, repita o prompt no chat/arquivo.
+
+
+Se quiser, te deixo pronto um “template comando” por página
+Use assim no Copilot Chat (troque NN):
+Aplicar regras estritas acima. Gere APENAS o JSX da Página NN (sem CSS ainda).
+Depois gere APENAS o CSS da Página NN em `src/pages/pgNN.css`.
+Não crie elementos nem fluxos extras. Manter ordem/posições/textos iguais ao PDF.
+
+E, quando houver dúvida de cor/medida:
+Antes de gerar, identifique TODAS as medidas/cores que não estão legíveis no PDF da Página NN e liste as perguntas objetivas. Não chute.
