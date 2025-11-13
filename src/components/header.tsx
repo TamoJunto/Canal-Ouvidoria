@@ -6,12 +6,36 @@ import { Input } from "./ui/input"
 
 export function Header() {
   const [showLoginModal, setShowLoginModal] = useState(false)
-  const [phoneNumber, setPhoneNumber] = useState("")
   const navigate = useNavigate()
+  const[celular, setCelular] = useState("")
+  const[logintype, setLoginType] = useState<"email" | "celular">("celular");
+  const[valor, setValor] = useState("")
+
+
 
   const handleLogin = (e: FormEvent) => {
     e.preventDefault()
-    
+
+    if(!valor.trim()) {
+      alert("Por favor, preencha o campo.")
+      return
+    }
+
+    if (logintype === "email") {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(valor)) {
+      alert("Email inválido.");
+    return
+    }
+
+    } else {
+      const celularLimpo = valor.replace(/\\D/g, "")
+      if (celularLimpo.length < 10) {
+        alert("Número de celular inválido.")
+        return
+      }
+    }
+
     setShowLoginModal(false)
     navigate("/admin")
   }
@@ -75,17 +99,62 @@ export function Header() {
           </DialogHeader>
           <form onSubmit={handleLogin} className="space-y-6 pt-4">
             <div className="space-y-2">
-              <Input
-                type="tel"
-                placeholder="(DD) 99999-9999"
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-                className="text-center text-lg"
-                required
-              />
+              <label className="flex items-center gap-4">
+                <input
+                  type="radio"
+                  name="loginType"
+                  value="email"
+                  checked={logintype === "email"}
+                  onChange={() => {
+                    setLoginType("email");
+                    setValor("");
+                  }}
+                />
+                <span className="text-lg">Email</span>
+              </label>
+              <label className="flex items-center gap-4">
+                <input
+                  type="radio"
+                  name="loginType"
+                  value="celular"
+                  checked={logintype === "celular"}
+                  onChange={() => {
+                    setLoginType("celular");
+                    setValor("");
+                  }}
+                />
+                <span className="text-lg">Celular</span>
+              </label>
+              {logintype === "email" && (
+                <Input
+                  type="email"
+                  placeholder="exemplo@exemplo.com"
+                  value={valor}
+                  onChange={(e) => setValor(e.target.value)}
+                  className="text-center text-lg"
+                  required
+                />
+              )}
+              {logintype === "celular" && (
+                <Input
+                  type="tel"
+                  placeholder="(DD) 99999-9999"
+                  value={valor}
+                  onChange={(e) => {
+                    let v = e.target.value.replace(/\D/g, '');
+                    v = v.replace(/(\d{2})(\d)/, '($1) $2');
+                    v = v.replace(/(\d{5})(\d)/, '$1-$2');
+                    setValor(v);
+                  }}
+                  className="text-center text-lg"
+                  required
+                />
+                
+              )}
+
             </div>
             <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-accent font-bold uppercase">
-              Submit
+              Login
             </Button>
           </form>
         </DialogContent>
