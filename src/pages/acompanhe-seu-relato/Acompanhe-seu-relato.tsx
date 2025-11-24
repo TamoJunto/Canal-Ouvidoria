@@ -1,24 +1,81 @@
 import type React from "react"
 import { Header } from "@/components/header"
 import { Input } from "@/components/ui/input"
-import { Search, X } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Label } from "@/components/ui/label"
+import { Search, X, MessageSquare, Clock, CheckCircle, Send } from "lucide-react"
 import { useState } from "react"
 import { Textarea } from "@/components/ui/textarea"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+
+// Mock de relatos com diferentes status
+const mockRelatos: Record<string, { 
+  protocolo: string
+  descricao: string
+  status: "pendente" | "respondido"
+  resposta?: string
+  dataEnvio: string
+  dataResposta?: string
+}> = {
+  "ZXA-S0R": {
+    protocolo: "ZXA-S0R",
+    descricao: "Relato sobre comportamento inadequado de um supervisor durante reuniões de equipe. O supervisor tem utilizado linguagem inadequada e feito comentários desrespeitosos.",
+    status: "pendente",
+    dataEnvio: "14/11/2025"
+  },
+  "ABC-123": {
+    protocolo: "ABC-123",
+    descricao: "Denúncia sobre possível conflito de interesses na contratação de fornecedores.",
+    status: "respondido",
+    dataEnvio: "10/11/2025",
+    dataResposta: "15/11/2025",
+    resposta: "Agradecemos seu relato. Iniciamos uma investigação interna sobre o caso mencionado. Nossa equipe de compliance está analisando todas as informações fornecidas e tomaremos as medidas necessárias. Você será informado sobre o andamento em breve."
+  },
+  "XYZ-789": {
+    protocolo: "XYZ-789",
+    descricao: "Relato sobre situação de assédio moral no ambiente de trabalho.",
+    status: "pendente",
+    dataEnvio: "12/11/2025"
+  }
+}
 
 export default function AcompanheSeuRelato() {
   const [protocolo, setProtocolo] = useState("")
   const [showResults, setShowResults] = useState(false)
+  const [showResponseDialog, setShowResponseDialog] = useState(false)
+  const [responseText, setResponseText] = useState("")
+  const [relatoEncontrado, setRelatoEncontrado] = useState<typeof mockRelatos[string] | null>(null)
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
-    if (protocolo) {
-      setShowResults(true)
+    if (protocolo.trim()) {
+      const relato = mockRelatos[protocolo.toUpperCase()]
+      if (relato) {
+        setRelatoEncontrado(relato)
+        setShowResults(true)
+      } else {
+        // Protocolo não encontrado
+        setRelatoEncontrado(null)
+        setShowResults(true)
+      }
     }
   }
 
   const clearSearch = () => {
     setProtocolo("")
     setShowResults(false)
+    setRelatoEncontrado(null)
+  }
+
+  const handleSendResponse = () => {
+    if (responseText.trim()) {
+      // Aqui você enviaria a resposta para o backend
+      console.log("Resposta enviada:", responseText)
+      setShowResponseDialog(false)
+      setResponseText("")
+      // Poderia mostrar uma mensagem de sucesso
+      alert("Sua mensagem foi enviada com sucesso! Nossa equipe irá analisar e responder em breve.")
+    }
   }
 
   return (
@@ -54,28 +111,133 @@ export default function AcompanheSeuRelato() {
 
             {showResults && (
               <div className="space-y-8 text-white">
-                <div>
-                  <h2 className="text-2xl font-bold mb-4">Minha Reclamação</h2>
-                  <p className="text-sm leading-relaxed">
-                    Relato Aleatório
-                  </p>
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold mb-4">Resposta</h3>
-                  <p className="text-sm leading-relaxed mb-6">
-                    Relato Aleatório
-                  </p>
-                </div>
+                {relatoEncontrado ? (
+                  <>
+                    {/* Informações do Relato */}
+                    <div>
+                      <h2 className="text-2xl font-bold mb-4">Minha Reclamação</h2>
+                      <div className="space-y-2 mb-4">
+                        <p className="text-sm text-white/80">
+                          <span className="font-semibold">Protocolo:</span> {relatoEncontrado.protocolo}
+                        </p>
+                        <p className="text-sm text-white/80">
+                          <span className="font-semibold">Data de envio:</span> {relatoEncontrado.dataEnvio}
+                        </p>
+                        <p className="text-sm text-white/80">
+                          <span className="font-semibold">Status:</span>{" "}
+                          <span className={relatoEncontrado.status === "respondido" ? "text-green-300 font-semibold" : "text-yellow-300 font-semibold"}>
+                            {relatoEncontrado.status === "respondido" ? "Respondido" : "Em análise"}
+                          </span>
+                        </p>
+                      </div>
+                      <p className="text-sm leading-relaxed bg-white text-foreground p-4 rounded-lg">
+                        {relatoEncontrado.descricao}
+                      </p>
+                    </div>
 
-                <div>
-                  <h3 className="text-xl font-bold mb-4">Resposta</h3>
-                  <Textarea placeholder="" className="bg-white border-0 text-foreground min-h-[120px] resize-none" />
-                </div>
+                    {/* Resposta da empresa */}
+                    {relatoEncontrado.status === "respondido" && relatoEncontrado.resposta ? (
+                      <div>
+                        <div className="flex items-center gap-2 mb-4">
+                          <CheckCircle className="h-5 w-5 text-green-300" />
+                          <h3 className="text-xl font-bold">Resposta</h3>
+                        </div>
+                        {relatoEncontrado.dataResposta && (
+                          <p className="text-sm text-white/80 mb-2">
+                            Respondido em: {relatoEncontrado.dataResposta}
+                          </p>
+                        )}
+                        <div className="bg-white text-foreground p-4 rounded-lg">
+                          <p className="text-sm leading-relaxed">
+                            {relatoEncontrado.resposta}
+                          </p>
+                        </div>
+                      </div>
+                    ) : (
+                      <div>
+                        <div className="flex items-center gap-2 mb-4">
+                          <Clock className="h-5 w-5 text-yellow-300" />
+                          <h3 className="text-xl font-bold">Status do Relato</h3>
+                        </div>
+                        <div className="bg-yellow-500/20 border border-yellow-400/50 p-4 rounded-lg">
+                          <p className="text-sm leading-relaxed">
+                            Seu relato está em análise pela nossa equipe. Você será notificado assim que houver uma resposta.
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Botão para enviar mensagem/resposta */}
+                    <div className="flex justify-center pt-4">
+                      <Button
+                        onClick={() => setShowResponseDialog(true)}
+                        className="bg-white hover:bg-white/90 text-primary font-semibold px-8 py-6 flex items-center gap-2"
+                      >
+                        <MessageSquare className="h-5 w-5" />
+                        Enviar Mensagem
+                      </Button>
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-center py-12">
+                    <p className="text-white text-lg mb-2">Protocolo não encontrado</p>
+                    <p className="text-white/80 text-sm">
+                      Verifique se o protocolo está correto e tente novamente.
+                    </p>
+                  </div>
+                )}
               </div>
             )}
           </div>
         </div>
       </main>
+
+      {/* Dialog para enviar mensagem/resposta */}
+      <Dialog open={showResponseDialog} onOpenChange={setShowResponseDialog}>
+        <DialogContent className="max-w-2xl rounded-3xl border-4 border-primary p-8">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-center mb-6">
+              Enviar Mensagem sobre seu Relato
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label className="text-base font-semibold mb-2 block">
+                Sua mensagem será analisada pela nossa equipe
+              </Label>
+              <p className="text-sm text-muted-foreground mb-4">
+                Descreva sua dúvida, solicitação ou comentário sobre o relato. Nossa equipe irá analisar e responder em breve.
+              </p>
+              <Textarea
+                className="min-h-32"
+                placeholder="Digite sua mensagem aqui..."
+                value={responseText}
+                onChange={(e) => setResponseText(e.target.value)}
+              />
+            </div>
+            <div className="flex justify-end gap-4">
+              <Button
+                onClick={() => {
+                  setShowResponseDialog(false)
+                  setResponseText("")
+                }}
+                variant="outline"
+                className="px-8"
+              >
+                Cancelar
+              </Button>
+              <Button
+                className="bg-primary hover:bg-primary/90 text-white px-8 flex items-center gap-2"
+                onClick={handleSendResponse}
+                disabled={!responseText.trim()}
+              >
+                <Send className="h-4 w-4" />
+                Enviar Mensagem
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

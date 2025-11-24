@@ -1,4 +1,4 @@
-import { HeaderAdmin } from "../homeadm"
+import { HeaderAdmin } from "@/components/headerAdmin"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Download, Calendar, BarChart3, TrendingUp, TrendingDown } from "lucide-react"

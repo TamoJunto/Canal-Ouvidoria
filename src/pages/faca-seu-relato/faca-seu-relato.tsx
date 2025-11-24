@@ -10,8 +10,6 @@ import { Textarea } from "@/components/ui/textarea"
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Value } from "@radix-ui/react-select"
-import { c, s } from "vite/dist/node/types.d-aGj9QkWt"
 
 export default function FacaSeuRelato() {
   const navigate = useNavigate()
@@ -31,10 +29,12 @@ export default function FacaSeuRelato() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    const naoSeIdentificou = identificar === "nao"
+    
     if (evidencias === "sim") {
-      navigate("/faca-seu-relato/anexos")
+      navigate("/faca-seu-relato/anexos", { state: { naoSeIdentificou } })
     } else {
-      navigate("/faca-seu-relato/relatofeito")
+      navigate("/faca-seu-relato/relatofeito", { state: { naoSeIdentificou } })
     }
   }
   const descricoesRelato: Record<string, string> = {
@@ -96,26 +96,6 @@ export default function FacaSeuRelato() {
                   </div>
 
                   <div className="space-y-3">
-                    <Label className="text-white text-sm font-medium">CPF</Label>
-                    <Input
-                      type="text"
-                      placeholder="Ex: 000.000.000-00"
-                      value={cpf}
-                      onChange={(e) =>{
-                        let v = e.target.value.replace(/\D/g, '');
-                        v = v.replace(/(\d{3})(\d)/, '$1.$2');
-                        v = v.replace(/(\d{3})(\d)/, '$1.$2');
-                        v = v.replace(/(\d{3})(\d{1,2})$/, '$1.$2');
-                        setCpf(v);
-                      }}
-                      maxLength={14}
-                      className="bg-white border-0 text-foreground"
-                      required
-
-                    />
-                  </div>
-
-                  <div className="space-y-3">
                     <Label className="text-white text-sm font-medium">E-mail</Label>
                     <Input
                       type="email"
@@ -123,22 +103,6 @@ export default function FacaSeuRelato() {
                       className="bg-white border-0 text-foreground"
                       required
                     />
-                  </div>
-
-                  <div className="space-y-3">
-                    <Label className="text-white text-sm font-medium">Data de Nascimento</Label>
-                    <Input type="text" 
-                    placeholder="DD/MM/ANO" 
-                    value={dataNascimento}
-                    onChange={(e) => {
-                      let v = e.target.value.replace(/\D/g, '');
-                      v = v.replace(/(\d{2})(\d)/, '$1/$2');
-                      v = v.replace(/(\d{2})(\d)/, '$1/$2');
-                      setDataNascimento(v);
-                    }}
-                    maxLength={10}
-                    className="bg-white border-0 text-foreground"
-                     required />
                   </div>
 
                   <div className="space-y-3">
@@ -162,15 +126,12 @@ export default function FacaSeuRelato() {
 
               {identificar === "nao" && (
                 <>
-                  <div className="space-y-4 text-white text-sm leading-relaxed">
+                  <div className="space-y-1 text-white text-sm leading-relaxed">
                     <p>
-                      Conflito de interesses, contratação de parentes, favorecimento, doações e
-                      hospitalidades(presentes, brindes, ingressos, eventos, refeições e viagens)
-                    </p>
-                    <p>
-                      É vedado a qualquer integrante usar a visibilidade ou o prestígio do Grupo Globo, assim como seu
-                      cargo ou função para influenciar alguém ou obter vantagens ou benefícios indevidos, sejam
-                      patrimoniais ou de outra natureza.
+                    Para receber atualizações sobre seu relato, agora você pode inserir um e-mail ou telefone e permanecer anônimo. 
+                    Dessa maneira, a empresa não receberá os seus dados de identificação, que serão utilizados pela Contato Seguro exclusivamente para envio de notificações. 
+                    O preenchimento destes campos não é obrigatório, mas facilita a comunicação entre você e a empresa.
+
                     </p>
                   </div>
 
@@ -369,7 +330,7 @@ export default function FacaSeuRelato() {
               </p>
               <p className="mt-2">
                 A Aliança Empreendedora respeita os direitos e liberdades fundamentais das pessoas, entre os quais o
-                direito à proteção de dados pessoais. A privacidade dos(as) denunciantes, denunciados(as) e testemunhas
+                direito à proteção de dados pessoais. A privacidade dos(as) denunciantes, denunciados(as) e testemunhas,
                 é um pilar básico para a organização, que trata seus dados pessoais com extremo respeito à legislação
                 vigente em matéria de proteção de dados pessoais, privacidade e segurança dessas informações. Para isso,
                 são adotadas medidas técnicas e organizacionais necessárias para evitar a perda, o uso indevido,
@@ -377,7 +338,6 @@ export default function FacaSeuRelato() {
                 da tecnologia, a natureza dos dados e os riscos a que eles estão expostos.
               </p>
             </div>
-
             <div>
               <h3 className="font-bold text-lg mb-2">2. Para que tratamos seus dados pessoais?</h3>
               <p>

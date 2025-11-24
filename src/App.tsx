@@ -12,6 +12,9 @@ import HomeRelatos from './pages/admin/relatos/homeRelatos'
 import HomeUsuarios from './pages/admin/usuarios/homeUsuarios'
 import Comites from './pages/admin/comites/comites'
 import DashADM from './pages/admin/dashboard/dashADM'
+import HomeOperador from './pages/operador/homeOperador'
+import HomeRelatosOperador from './pages/operador/relatos/homeRelatosOperador'
+import DashOperador from './pages/operador/dashboard/dashOperador'
 
 function App() {
   return (
@@ -29,6 +32,9 @@ function App() {
       <Route path="/admin/usuarios" element={<HomeUsuarios />} />
       <Route path="/admin/comites" element={<Comites />} />
       <Route path="/admin/dashboard" element={<DashADM />} />
+      <Route path="/operador" element={<HomeOperador />} />
+      <Route path="/operador/relatos" element={<HomeRelatosOperador />} />
+      <Route path="/operador/dashboard" element={<DashOperador />} />
     </Routes>
   )
 }

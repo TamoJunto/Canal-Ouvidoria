@@ -1,9 +1,9 @@
-import { Header } from "@/components/header"
+import { ConditionalHeader } from "@/components/ConditionalHeader"
 
 export default function CodigoDeEtica() {
   return (
     <div className="min-h-screen bg-background">
-      <Header />
+      <ConditionalHeader />
 
       <main className="max-w-6xl mx-auto px-4 py-12 md:py-16">
         <div className="space-y-8">

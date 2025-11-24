@@ -4,11 +4,15 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Upload, X } from "lucide-react"
 import { useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useLocation } from "react-router-dom"
 
 export default function AnexosPage() {
   const [anexos, setAnexos] = useState<File[]>([])
   const navigate = useNavigate()
+  const location = useLocation()
+  
+  // Pega a informação se não se identificou do state da navegação
+  const naoSeIdentificou = (location.state as { naoSeIdentificou?: boolean })?.naoSeIdentificou || false
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       if (e.target.files) {
@@ -22,7 +26,7 @@ export default function AnexosPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    navigate("/faca-seu-relato/relatofeito")
+    navigate("/faca-seu-relato/relatofeito", { state: { naoSeIdentificou } })
   }
 
   return (

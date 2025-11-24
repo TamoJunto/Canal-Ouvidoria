@@ -22,22 +22,26 @@ export function Header() {
     }
 
     if (logintype === "email") {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(valor)) {
-      alert("Email inválido.");
-    return
-    }
-
-    } else {
-      const celularLimpo = valor.replace(/\\D/g, "")
-      if (celularLimpo.length < 10) {
-        alert("Número de celular inválido.")
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      if (!emailRegex.test(valor)) {
+        alert("Email inválido.")
         return
       }
     }
 
+    // TODO: Quando tiver backend, verificar o tipo de usuário (admin ou operador)
+    // Por enquanto, vamos usar uma lógica simples baseada no email
+    // Emails que terminam com @admin ou contêm "admin" vão para /admin
+    // Outros vão para /operador
+    const isAdmin = valor.toLowerCase().includes("admin") || valor.toLowerCase().endsWith("@admin.com")
+    
     setShowLoginModal(false)
-    navigate("/admin")
+    
+    if (isAdmin) {
+      navigate("/admin")
+    } else {
+      navigate("/operador")
+    }
   }
 
   return (
@@ -99,59 +103,15 @@ export function Header() {
           </DialogHeader>
           <form onSubmit={handleLogin} className="space-y-6 pt-4">
             <div className="space-y-2">
-              <label className="flex items-center gap-4">
-                <input
-                  type="radio"
-                  name="loginType"
-                  value="email"
-                  checked={logintype === "email"}
-                  onChange={() => {
-                    setLoginType("email");
-                    setValor("");
-                  }}
-                />
-                <span className="text-lg">Email</span>
-              </label>
-              <label className="flex items-center gap-4">
-                <input
-                  type="radio"
-                  name="loginType"
-                  value="celular"
-                  checked={logintype === "celular"}
-                  onChange={() => {
-                    setLoginType("celular");
-                    setValor("");
-                  }}
-                />
-                <span className="text-lg">Celular</span>
-              </label>
-              {logintype === "email" && (
-                <Input
-                  type="email"
-                  placeholder="exemplo@exemplo.com"
-                  value={valor}
-                  onChange={(e) => setValor(e.target.value)}
-                  className="text-center text-lg"
-                  required
-                />
-              )}
-              {logintype === "celular" && (
-                <Input
-                  type="tel"
-                  placeholder="(DD) 99999-9999"
-                  value={valor}
-                  onChange={(e) => {
-                    let v = e.target.value.replace(/\D/g, '');
-                    v = v.replace(/(\d{2})(\d)/, '($1) $2');
-                    v = v.replace(/(\d{5})(\d)/, '$1-$2');
-                    setValor(v);
-                  }}
-                  className="text-center text-lg"
-                  required
-                />
-                
-              )}
-
+              
+              <Input
+                type="email"
+                placeholder="exemplo@exemplo.com"
+                value={valor}
+                onChange={(e) => setValor(e.target.value)}
+                className="text-center text-lg"
+                required
+              />
             </div>
             <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-accent font-bold uppercase">
               Login
