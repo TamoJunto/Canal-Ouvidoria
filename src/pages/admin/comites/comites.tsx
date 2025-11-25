@@ -27,23 +27,20 @@ interface Comite {
 // Mock de usuários ativos (normalmente viria de uma API ou contexto compartilhado)
 const mockUsuariosAtivos: Usuario[] = [
   { id: 1, nome: "Frank Oceano", email: "frank.oceano@email.com", status: "Ativo" },
-  { id: 3, nome: "j Cole", email: "maria.silva@email.com", status: "Ativo" },
-  { id: 4, nome: "Drake", email: "joao.santos@email.com", status: "Ativo" },
-  { id: 6, nome: "Travis Scott", email: "ana.costa@email.com", status: "Ativo" },
-  { id: 7, nome: "Tyler, The Creator", email: "pedro.oliveira@email.com", status: "Ativo" },
-  { id: 8, nome: "Kanye West", email: "carla.souza@email.com", status: "Ativo" },
-  { id: 9, nome: "MF DOOM", email: "roberto.lima@email.com", status: "Ativo" },
-  { id: 10, nome: "Mac Miller", email: "juliana.ferreira@email.com", status: "Ativo" },
+  { id: 3, nome: "J. Cole", email: "j.cole@email.com", status: "Ativo" },
+  { id: 4, nome: "Drake Graham", email: "drake.graham@email.com", status: "Ativo" },
+  { id: 6, nome: "Travis Scott", email: "travis.scott@email.com", status: "Ativo" },
+  { id: 7, nome: "Tyler, The Creator", email: "tyler.creator@email.com", status: "Ativo" },
+  { id: 8, nome: "Kanye West", email: "kanye.west@email.com", status: "Ativo" },
+  { id: 9, nome: "MF DOOM", email: "mf.doom@email.com", status: "Ativo" },
+  { id: 10, nome: "Mac Miller", email: "mac.miller@email.com", status: "Ativo" },
 ]
 
 const mockComites: Comite[] = [
-  { id: 1, nome: "Comitê 1", participantesIds: [1, 3, 4], status: "Ativo" },
-  { id: 2, nome: "Comitê 2", participantesIds: [6, 7], status: "Inativo" },
-  { id: 3, nome: "Comitê 3", participantesIds: [4, 8, 9], status: "Ativo" },
-  { id: 4, nome: "Comitê 4", participantesIds: [1, 6, 10], status: "Ativo" },
-  { id: 5, nome: "Comitê 5", participantesIds: [3, 7], status: "Inativo" },
-  { id: 6, nome: "Comitê 6", participantesIds: [8, 9, 10], status: "Ativo" },
-  { id: 7, nome: "Comitê 7", participantesIds: [1, 4, 6, 7], status: "Ativo" },
+  { id: 1, nome: "Comitê Executivo", participantesIds: [1, 3, 4], status: "Ativo" },
+  { id: 2, nome: "Comitê Jurídico", participantesIds: [6, 7], status: "Inativo" },
+  { id: 3, nome: "Comitê Financeiro", participantesIds: [4, 8, 9], status: "Ativo" },
+  { id: 4, nome: "Comitê de Diversidade e Associados", participantesIds: [1, 6, 10], status: "Ativo" },
 ]
 
 export default function ComitesPage() {
@@ -58,6 +55,11 @@ export default function ComitesPage() {
     participantesIds: [] as number[],
     status: "Ativo" as "Ativo" | "Inativo"
   })
+
+  const getParticipanteNomes = (ids: number[]) =>
+    ids
+      .map((id) => mockUsuariosAtivos.find((usuario) => usuario.id === id)?.nome)
+      .filter((nome): nome is string => Boolean(nome))
 
   const handleEditComite = (comite: Comite) => {
     setSelectedComite(comite)
@@ -112,10 +114,10 @@ export default function ComitesPage() {
                       <SelectValue placeholder="Selecione a equipe" />
                     </SelectTrigger>
                     <SelectContent className="bg-white text-black">
-                      <SelectItem value="Comitê 1">Comitê 1</SelectItem>
-                      <SelectItem value="Comitê 2">Comitê 2</SelectItem>
-                      <SelectItem value="Comitê 3">Comitê 3</SelectItem>
-                      <SelectItem value="Comitê 4">Comitê 4</SelectItem>
+                      <SelectItem value="Comitê Executivo">Comitê Executivo</SelectItem>
+                      <SelectItem value="Comitê Jurídico">Comitê Jurídico</SelectItem>
+                      <SelectItem value="Comitê Financeiro">Comitê Financeiro</SelectItem>
+                      <SelectItem value="Comitê de Diversidade e Associados">Comitê de Diversidade e Associados</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -130,28 +132,35 @@ export default function ComitesPage() {
             </div>
 
             <div className="space-y-3">
-              {comites.map((comite) => (
-                <div
-                  key={comite.id}
-                  onClick={() => handleEditComite(comite)}
-                  className="flex items-center justify-between bg-gray-100 rounded-full px-6 py-4 border border-gray-200 cursor-pointer hover:bg-gray-200 transition-colors"
-                >
-                  <div className="flex items-center gap-2 flex-1">
-                    <span className="font-semibold">Comite:</span>
-                    <span>{comite.nome}</span>
+              {comites.map((comite) => {
+                const nomes = getParticipanteNomes(comite.participantesIds)
+                const nomesFormatados = nomes.join(" • ")
+
+                return (
+                  <div
+                    key={comite.id}
+                    onClick={() => handleEditComite(comite)}
+                    className="flex items-center justify-between bg-gray-100 rounded-3xl px-6 py-4 border border-gray-200 cursor-pointer hover:bg-gray-200 transition-colors"
+                  >
+                    <div className="flex flex-col gap-1 flex-1 pr-4">
+                      <span className="font-semibold text-sm uppercase tracking-wide text-muted-foreground">Comitê</span>
+                      <span className="font-medium text-lg">{comite.nome}</span>
+                    </div>
+                    <div className="flex flex-col gap-1 flex-[1.2] items-center text-center">
+                      <span className="font-semibold text-sm uppercase tracking-wide text-muted-foreground">
+                        Integrantes ({nomes.length})
+                      </span>
+                      <span className="text-sm text-gray-600 line-clamp-2">{nomesFormatados}</span>
+                    </div>
+                    <div className="flex flex-col gap-1 flex-1 items-end">
+                      <span className="font-semibold text-sm uppercase tracking-wide text-muted-foreground">Status</span>
+                      <span className={comite.status === "Ativo" ? "text-green-600 font-semibold" : "text-gray-400"}>
+                        {comite.status}
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2 flex-1 justify-center">
-                    <span className="font-semibold">Integrantes:</span>
-                    <span>{comite.participantesIds.length}</span>
-                  </div>
-                  <div className="flex items-center gap-2 flex-1 justify-end">
-                    <span className="font-semibold">Status:</span>
-                    <span className={comite.status === "Ativo" ? "text-green-600 font-semibold" : "text-gray-400"}>
-                      {comite.status}
-                    </span>
-                  </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           </div>
         </div>

@@ -20,13 +20,14 @@ interface Usuario {
 }
 
 const mockUsuarios: Usuario[] = [
-  { id: 1, nome: "Frank Oceano", email: "frank.oceano@email.com", comite: "Comitê 1", status: "Ativo", avatar: "/placeholder.svg?height=40&width=40" },
-  { id: 2, nome: "Frank Oceano", email: "frank.oceano2@email.com", comite: "Comitê 2", status: "Inativo", avatar: "/placeholder.svg?height=40&width=40" },
-  { id: 3, nome: "Frank Oceano", email: "frank.oceano3@email.com", comite: "Comitê 1", status: "Ativo", avatar: "/placeholder.svg?height=40&width=40" },
-  { id: 4, nome: "Frank Oceano", email: "frank.oceano4@email.com", comite: "Comitê 3", status: "Ativo", avatar: "/placeholder.svg?height=40&width=40" },
-  { id: 5, nome: "Frank Oceano", email: "frank.oceano5@email.com", comite: "Comitê 2", status: "Inativo", avatar: "/placeholder.svg?height=40&width=40" },
-  { id: 6, nome: "Frank Oceano", email: "frank.oceano6@email.com", comite: "Comitê 4", status: "Ativo", avatar: "/placeholder.svg?height=40&width=40" },
-  { id: 7, nome: "Frank Oceano", email: "frank.oceano7@email.com", comite: "Comitê 1", status: "Ativo", avatar: "/placeholder.svg?height=40&width=40" },
+  { id: 1, nome: "Frank Oceano", email: "frank.oceano@email.com", comite: "Comitê Executivo", status: "Ativo", avatar: "/placeholder.svg?height=40&width=40" },
+  { id: 2, nome: "J. Cole", email: "j.cole@email.com", comite: "Comitê Executivo", status: "Inativo", avatar: "/placeholder.svg?height=40&width=40" },
+  { id: 3, nome: "Drake Graham", email: "drake.graham@email.com", comite: "Comitê Jurídico", status: "Ativo", avatar: "/placeholder.svg?height=40&width=40" },
+  { id: 4, nome: "Travis Scott", email: "travis.scott@email.com", comite: "Comitê Jurídico", status: "Ativo", avatar: "/placeholder.svg?height=40&width=40" },
+  { id: 5, nome: "Tyler, The Creator", email: "tyler.creator@email.com", comite: "Comitê Financeiro", status: "Inativo", avatar: "/placeholder.svg?height=40&width=40" },
+  { id: 6, nome: "Kanye West", email: "kanye.west@email.com", comite: "Comitê Financeiro", status: "Ativo", avatar: "/placeholder.svg?height=40&width=40" },
+  { id: 7, nome: "MF DOOM", email: "mf.doom@email.com", comite: "Comitê de Diversidade e Associados", status: "Ativo", avatar: "/placeholder.svg?height=40&width=40" },
+  { id: 8, nome: "Mac Miller", email: "mac.miller@email.com", comite: "Comitê de Diversidade e Associados", status: "Ativo", avatar: "/placeholder.svg?height=40&width=40" },
 ]
 
 export default function UsuariosPage() {
@@ -77,14 +78,14 @@ export default function UsuariosPage() {
                 </div>
                 <div className="flex flex-col">
                   <Select value={equipeFilter} onValueChange={setEquipeFilter}>
-                    <SelectTrigger className="w-48 text-black border-primary text-black">
+                    <SelectTrigger className="w-48 text-black border-primary">
                       <SelectValue placeholder="Selecione a equipe" className="text-black" />
                     </SelectTrigger>
                     <SelectContent className="bg-white text-black">
-                      <SelectItem value="Comitê 1">Comitê 1</SelectItem>
-                      <SelectItem value="Comitê 2">Comitê 2</SelectItem>
-                      <SelectItem value="Comitê 3">Comitê 3</SelectItem>
-                      <SelectItem value="Comitê 4">Comitê 4</SelectItem>
+                      <SelectItem value="Comitê Executivo">Comitê Executivo</SelectItem>
+                      <SelectItem value="Comitê Jurídico">Comitê Jurídico</SelectItem>
+                      <SelectItem value="Comitê Financeiro">Comitê Financeiro</SelectItem>
+                      <SelectItem value="Comitê de Diversidade e Associados">Comitê de Diversidade e Associados</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -212,10 +213,10 @@ export default function UsuariosPage() {
                   <SelectValue placeholder="Selecione o comitê" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Comitê 1">Comitê 1</SelectItem>
-                  <SelectItem value="Comitê 2">Comitê 2</SelectItem>
-                  <SelectItem value="Comitê 3">Comitê 3</SelectItem>
-                  <SelectItem value="Comitê 4">Comitê 4</SelectItem>
+                  <SelectItem value="Comitê Executivo">Comitê Executivo</SelectItem>
+                  <SelectItem value="Comitê Jurídico">Comitê Jurídico</SelectItem>
+                  <SelectItem value="Comitê Financeiro">Comitê Financeiro</SelectItem>
+                  <SelectItem value="Comitê de Diversidade e Associados">Comitê de Diversidade e Associados</SelectItem>
                 </SelectContent>
               </Select>
             </div>
