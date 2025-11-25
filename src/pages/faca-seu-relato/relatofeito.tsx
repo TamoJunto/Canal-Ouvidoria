@@ -7,19 +7,24 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 export default function SucessoPage() {
   const location = useLocation()
-  const naoSeIdentificou = (location.state as { naoSeIdentificou?: boolean })?.naoSeIdentificou || false
+  const locationState = location.state as { naoSeIdentificou?: boolean; receberProtocoloPorEmail?: boolean } | undefined
+  const naoSeIdentificou = locationState?.naoSeIdentificou ?? false
+  const receberProtocoloPorEmail = locationState?.receberProtocoloPorEmail ?? !naoSeIdentificou
 
   const protocolo = "ZXA-S0R"
   const [copied, setCopied] = useState(false)
+  const [hasCopied, setHasCopied] = useState(false)
 
   const handleCopy = () => {
     navigator.clipboard.writeText(protocolo).then(() => {
       setCopied(true)
+      setHasCopied(true)
       setTimeout(() => {
         setCopied(false)
       }, 2000)
     }).catch(() => {
       setCopied(true)
+      setHasCopied(true)
       setTimeout(() => {
         setCopied(false)
       }, 2000)
@@ -52,27 +57,33 @@ export default function SucessoPage() {
               </div>
             </div>
 
-            <p className="text-white text-lg max-w-2xl leading-relaxed">
-              {/* Alerta para quem não se identificou - dentro do quadro */}
-              {naoSeIdentificou && (
-                <Alert className="w-full max-w-2xl border-2 border-yellow-400 bg-yellow-50/95 shadow-lg">
+            <div className="w-full max-w-2xl space-y-4 text-white text-lg leading-relaxed">
+              {naoSeIdentificou && !receberProtocoloPorEmail ? (
+                <Alert className="border-2 border-yellow-400 bg-yellow-50/95 shadow-lg">
                   <AlertTriangle className="h-5 w-5 text-yellow-600 flex-shrink-0" />
                   <div className="flex-1">
                     <AlertTitle className="text-yellow-800 font-bold text-lg mb-2">Atenção: Guarde seu protocolo!</AlertTitle>
                     <AlertDescription className="text-yellow-700 font-bold text-center">
-                      <strong className="font-semibold">Como você escolheu não se identificar Não será possível reenviar o código do protocolo por e-mail É fundamental que você guarde este código para acompanhar o andamento do seu relato.</strong>  
-                       
+                      <strong className="font-semibold">Como você escolheu não se identificar, não será possível reenviar o código do protocolo por e-mail. Guarde este código para acompanhar o andamento do seu relato.</strong>  
                     </AlertDescription>
                   </div>
                 </Alert>
+              ) : (
+                <p className="text-white/90 text-center font-semibold">
+                  Consulte pelo protocolo enviado no Email de relacionamento.
+                </p>
               )}
-            </p>
+            </div>
 
-            <Link to="/">
-              <Button className="bg-white hover:bg-white/90 text-foreground font-semibold uppercase tracking-wide px-12 py-6 mt-8">
-                FINALIZAR
-              </Button>
-            </Link>
+            {hasCopied ? (
+              <Link to="/">
+                <Button className="bg-white hover:bg-white/90 text-foreground font-semibold uppercase tracking-wide px-12 py-6 mt-8">
+                  FINALIZAR
+                </Button>
+              </Link>
+            ) : (
+              <p className="text-white/80 text-sm font-medium mt-6">Copie o protocolo para liberar o botão de finalizar.</p>
+            )}
 
             <span className="absolute bottom-8 right-12 text-white text-4xl font-light">3</span>
           </div>

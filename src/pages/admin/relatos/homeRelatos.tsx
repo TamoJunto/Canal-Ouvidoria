@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { useState } from "react"
-import { ChevronLeft, Mail, Clock, Check, MessageSquare, RotateCcw, FileText } from "lucide-react"
+import { AlertTriangle, ChevronLeft, Mail, Clock, Check, MessageSquare, RotateCcw, FileText } from "lucide-react"
 
 const mockRelatos = [
   // --- 6 NOVOS ---
@@ -313,7 +313,7 @@ export default function RelatosPage() {
       }
     ]
   })
-  const [finalResponses, setFinalResponses] = useState<Record<number, string>>({
+  const [finalResponses] = useState<Record<number, string>>({
     // Respostas finais mockadas
     13: "Investigação concluída. Fornecedor foi bloqueado permanentemente e política de compliance foi reforçada com toda a equipe de compras. Todos os processos de licitação foram revisados.",
     14: "Medidas disciplinares aplicadas em ambos os funcionários após análise das câmeras. Ambos receberam advertência formal e foram orientados sobre conduta profissional.",
@@ -574,6 +574,13 @@ export default function RelatosPage() {
             <DialogTitle className="text-2xl font-bold text-center mb-6">Responder</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
+            <div className="flex items-start gap-3 rounded-2xl border border-yellow-400/70 bg-yellow-50 p-4 text-sm text-yellow-900">
+              <AlertTriangle className="h-5 w-5 text-yellow-600 mt-0.5" />
+              <div>
+                <p className="font-semibold">Esta é a resposta final do caso.</p>
+                <p>Ao enviar, o relato será encerrado para a parte denunciante. Revise com atenção — depois de enviada, a mensagem não poderá ser alterada.</p>
+              </div>
+            </div>
             <div>
               <Label className="text-base font-semibold">Mensagem</Label>
               <Textarea className="mt-2 min-h-32" placeholder="Digite sua resposta..." />

@@ -1,4 +1,4 @@
-import type React from "react"
+import type { FormEvent } from "react"
 import { Header } from "@/components/header"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -19,22 +19,26 @@ export default function FacaSeuRelato() {
   const [showLgpdModal, setShowLgpdModal] = useState(false)
   const [relacao, setRelacao] = useState("")
   const [tipoRelato, setTipoRelato] = useState("")
-  const [cpf, setCpf] = useState("");
-  const [dataNascimento, setDataNascimento] = useState("");
-  const [celular, setCelular] = useState("");
+  const [celular, setCelular] = useState("")
+  const [contatoEmail, setContatoEmail] = useState("")
+  const [anonEmail, setAnonEmail] = useState("")
   
 
 
 
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
     const naoSeIdentificou = identificar === "nao"
+    const receberProtocoloPorEmail =
+      identificar === "sim"
+        ? contatoEmail.trim().length > 0
+        : anonEmail.trim().length > 0
     
     if (evidencias === "sim") {
-      navigate("/faca-seu-relato/anexos", { state: { naoSeIdentificou } })
+      navigate("/faca-seu-relato/anexos", { state: { naoSeIdentificou, receberProtocoloPorEmail } })
     } else {
-      navigate("/faca-seu-relato/relatofeito", { state: { naoSeIdentificou } })
+      navigate("/faca-seu-relato/relatofeito", { state: { naoSeIdentificou, receberProtocoloPorEmail } })
     }
   }
   const descricoesRelato: Record<string, string> = {
@@ -101,6 +105,8 @@ export default function FacaSeuRelato() {
                       type="email"
                       placeholder="exemplo@exemplo.com"
                       className="bg-white border-0 text-foreground"
+                      value={contatoEmail}
+                      onChange={(e) => setContatoEmail(e.target.value)}
                       required
                     />
                   </div>
@@ -136,12 +142,13 @@ export default function FacaSeuRelato() {
                   </div>
 
                   <div className="space-y-3">
-                    <Label className="text-white text-sm font-medium">E-mail</Label>
+                    <Label className="text-white text-sm font-medium">E-mail (opcional)</Label>
                     <Input
                       type="email"
                       placeholder="exemplo@exemplo.com"
                       className="bg-white border-0 text-foreground"
-                      required
+                      value={anonEmail}
+                      onChange={(e) => setAnonEmail(e.target.value)}
                     />
                   </div>
                 </>

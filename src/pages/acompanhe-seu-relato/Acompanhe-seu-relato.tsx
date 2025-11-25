@@ -1,4 +1,4 @@
-import type React from "react"
+import type { FormEvent } from "react"
 import { Header } from "@/components/header"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 
 // Mock de relatos com diferentes status
-const mockRelatos: Record<string, { 
+const mockRelatos: Record<string, {
   protocolo: string
   descricao: string
   status: "pendente" | "respondido"
@@ -46,7 +46,7 @@ export default function AcompanheSeuRelato() {
   const [responseText, setResponseText] = useState("")
   const [relatoEncontrado, setRelatoEncontrado] = useState<typeof mockRelatos[string] | null>(null)
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = (e: FormEvent) => {
     e.preventDefault()
     if (protocolo.trim()) {
       const relato = mockRelatos[protocolo.toUpperCase()]
@@ -139,8 +139,8 @@ export default function AcompanheSeuRelato() {
                     {relatoEncontrado.status === "respondido" && relatoEncontrado.resposta ? (
                       <div>
                         <div className="flex items-center gap-2 mb-4">
-                          <CheckCircle className="h-5 w-5 text-green-300" />
-                          <h3 className="text-xl font-bold">Resposta</h3>
+                          <CheckCircle className="h-5 w-5 text-blue-300" />
+                          <h3 className="text-xl font-bold">Relato Finalizado</h3>
                         </div>
                         {relatoEncontrado.dataResposta && (
                           <p className="text-sm text-white/80 mb-2">
@@ -168,15 +168,21 @@ export default function AcompanheSeuRelato() {
                     )}
 
                     {/* Botão para enviar mensagem/resposta */}
-                    <div className="flex justify-center pt-4">
-                      <Button
-                        onClick={() => setShowResponseDialog(true)}
-                        className="bg-white hover:bg-white/90 text-primary font-semibold px-8 py-6 flex items-center gap-2"
-                      >
-                        <MessageSquare className="h-5 w-5" />
-                        Enviar Mensagem
-                      </Button>
-                    </div>
+                    {relatoEncontrado.status === "pendente" ? (
+                      <div className="flex justify-center pt-4">
+                        <Button
+                          onClick={() => setShowResponseDialog(true)}
+                          className="bg-white hover:bg-white/90 text-primary font-semibold px-8 py-6 flex items-center gap-2"
+                        >
+                          <MessageSquare className="h-5 w-5" />
+                          Enviar Mensagem
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="mt-6 bg-white/10 border border-white/20 rounded-2xl p-4 text-center text-sm text-white/80">
+                        Relato encerrado. Para novos apontamentos, abra um novo protocolo.
+                      </div>
+                    )}
                   </>
                 ) : (
                   <div className="text-center py-12">
