@@ -14,9 +14,13 @@ export default function CodigoDeEtica() {
               <p>Aqui você encontra o Código de Ética e Conduta da Aliança Empreendedora na íntegra.</p>
 
               <p>
-                Ele reúne as diretrizes e normas de conduta que orientam nosso comportamento cotidiano, e também os
-                cuidados que devemos ter ao desenvolvermos nossas atividades e nos relacionarmos com outros
-                profissionais e organizações
+                O documento reúne as diretrizes e normas que orientam nosso comportamento cotidiano, assim como os 
+                cuidados e boas práticas essenciais para a realização de nossas atividades e para nossos relacionamentos com 
+                outras pessoas e organizações.
+              </p>
+              <p> 
+                Ele reflete os valores que sustentam nossa atuação e reforça o compromisso da Aliança Empreendedora com ética,
+                transparência, respeito e promoção da diversidade em todas as nossas iniciativas. 
               </p>
             </div>
           </div>

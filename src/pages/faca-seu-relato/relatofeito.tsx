@@ -40,7 +40,7 @@ export default function SucessoPage() {
           <h1 className="text-4xl md:text-5xl font-bold text-foreground text-center mb-12">Finalizado</h1>
 
           <div className="bg-primary rounded-3xl p-8 md:p-16 relative min-h-[600px] flex flex-col items-center justify-center text-center space-y-12">
-            <h1 className="text-3xl md:text-4xl font-bold text-white">Sua reclamação foi realizada com sucesso!</h1>
+            <h1 className="text-3xl md:text-4xl font-bold text-white">Seu Relato foi registrado com sucesso!</h1>
             
             <div className="space-y-6 flex flex-col items-center justify-center text-center animate-fadeIn">
               <p className="text-xl md:text-2xl text-white font-medium">O Protocolo da sua denúncia é:</p>
@@ -70,7 +70,7 @@ export default function SucessoPage() {
                 </Alert>
               ) : (
                 <p className="text-white/90 text-center font-semibold">
-                  Consulte pelo protocolo enviado no Email de relacionamento.
+                  Enviamos o protocolo do Relato para o e-mail informado.
                 </p>
               )}
             </div>

@@ -3,7 +3,7 @@ import { Header } from "@/components/header"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
-import { Search, X, MessageSquare, Clock, CheckCircle, Send } from "lucide-react"
+import { Search, X, MessageSquare, Clock, CheckCircle, Send, AlertCircle } from "lucide-react"
 import { useState } from "react"
 import { Textarea } from "@/components/ui/textarea"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
@@ -16,12 +16,16 @@ const mockRelatos: Record<string, {
   resposta?: string
   dataEnvio: string
   dataResposta?: string
+  mensagensEnviadas?: { texto: string; data: string }[]
 }> = {
   "ZXA-S0R": {
     protocolo: "ZXA-S0R",
     descricao: "Relato sobre comportamento inadequado de um supervisor durante reuniões de equipe. O supervisor tem utilizado linguagem inadequada e feito comentários desrespeitosos.",
     status: "pendente",
-    dataEnvio: "14/11/2025"
+    dataEnvio: "14/11/2025",
+    mensagensEnviadas: [
+      { texto: "Gostaria de adicionar que esse comportamento se repete todas as semanas.", data: "16/11/2025" }
+    ]
   },
   "ABC-123": {
     protocolo: "ABC-123",
@@ -29,7 +33,10 @@ const mockRelatos: Record<string, {
     status: "respondido",
     dataEnvio: "10/11/2025",
     dataResposta: "15/11/2025",
-    resposta: "Agradecemos seu relato. Iniciamos uma investigação interna sobre o caso mencionado. Nossa equipe de compliance está analisando todas as informações fornecidas e tomaremos as medidas necessárias. Você será informado sobre o andamento em breve."
+    resposta: "Agradecemos seu relato. Iniciamos uma investigação interna sobre o caso mencionado. Nossa equipe de compliance está analisando todas as informações fornecidas e tomaremos as medidas necessárias. Você será informado sobre o andamento em breve.",
+    mensagensEnviadas: [
+      { texto: "Consegui mais informações sobre o caso. O fornecedor X também está envolvido.", data: "12/11/2025" }
+    ]
   },
   "XYZ-789": {
     protocolo: "XYZ-789",
@@ -45,6 +52,25 @@ export default function AcompanheSeuRelato() {
   const [showResponseDialog, setShowResponseDialog] = useState(false)
   const [responseText, setResponseText] = useState("")
   const [relatoEncontrado, setRelatoEncontrado] = useState<typeof mockRelatos[string] | null>(null)
+
+  // Função para calcular dias desde o envio
+  const calcularDiasDesdeEnvio = (dataEnvio: string): number => {
+    const partes = dataEnvio.split("/")
+    const dataRelato = new Date(Number(partes[2]), Number(partes[1]) - 1, Number(partes[0]))
+    const hoje = new Date()
+    const diffTime = Math.abs(hoje.getTime() - dataRelato.getTime())
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+    return diffDays
+  }
+
+  // Verifica se pode enviar mensagem (até 15 dias)
+  const podeEnviarMensagem = relatoEncontrado 
+    ? calcularDiasDesdeEnvio(relatoEncontrado.dataEnvio) <= 15 
+    : false
+  
+  const diasPassados = relatoEncontrado 
+    ? calcularDiasDesdeEnvio(relatoEncontrado.dataEnvio) 
+    : 0
 
   const handleSearch = (e: FormEvent) => {
     e.preventDefault()
@@ -84,7 +110,7 @@ export default function AcompanheSeuRelato() {
 
       <main className="flex flex-col items-center px-4 py-12 md:py-16">
         <div className="w-full max-w-5xl">
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground text-center mb-12">Acompanhe Seu Relato</h1>
+          <h1 className="text-4xl md:text-5xl font-bold text-foreground text-center mb-12">Acompanhe seu Relato</h1>
 
           <div className="bg-primary rounded-3xl p-8 md:p-12 min-h-[500px]">
             <form onSubmit={handleSearch} className="mb-8">
@@ -94,18 +120,27 @@ export default function AcompanheSeuRelato() {
                   placeholder="Digite o Protocolo"
                   value={protocolo}
                   onChange={(e) => setProtocolo(e.target.value)}
-                  className="bg-white border-0 text-foreground pr-12 py-6 text-base"
+                  className="bg-white border-0 text-foreground pr-24 py-6 text-base"
                 />
-                {protocolo && (
-                  <button type="button" onClick={clearSearch} className="absolute right-4 top-1/2 -translate-y-1/2">
-                    <X className="w-5 h-5 text-muted-foreground" />
-                  </button>
-                )}
-                {!protocolo && (
-                  <button type="submit" className="absolute right-4 top-1/2 -translate-y-1/2">
+                <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                  {protocolo && (
+                    <button 
+                      type="button" 
+                      onClick={clearSearch} 
+                      className="hover:opacity-70 transition-opacity"
+                      title="Limpar busca"
+                    >
+                      <X className="w-5 h-5 text-muted-foreground" />
+                    </button>
+                  )}
+                  <button 
+                    type="submit" 
+                    className="hover:opacity-70 transition-opacity"
+                    title="Buscar"
+                  >
                     <Search className="w-5 h-5 text-muted-foreground" />
                   </button>
-                )}
+                </div>
               </div>
             </form>
 
@@ -115,7 +150,7 @@ export default function AcompanheSeuRelato() {
                   <>
                     {/* Informações do Relato */}
                     <div>
-                      <h2 className="text-2xl font-bold mb-4">Minha Reclamação</h2>
+                      <h2 className="text-2xl font-bold mb-4">Meu Relato</h2>
                       <div className="space-y-2 mb-4">
                         <p className="text-sm text-white/80">
                           <span className="font-semibold">Protocolo:</span> {relatoEncontrado.protocolo}
@@ -167,12 +202,51 @@ export default function AcompanheSeuRelato() {
                       </div>
                     )}
 
+                    {/* Mensagens enviadas pelo denunciante */}
+                    {relatoEncontrado.mensagensEnviadas && relatoEncontrado.mensagensEnviadas.length > 0 && (
+                      <div>
+                        <div className="flex items-center gap-2 mb-4">
+                          <MessageSquare className="h-5 w-5 text-blue-300" />
+                          <h3 className="text-xl font-bold">Minhas Mensagens</h3>
+                        </div>
+                        <div className="space-y-3">
+                          {relatoEncontrado.mensagensEnviadas.map((mensagem, index) => (
+                            <div key={index} className="bg-white text-foreground p-4 rounded-lg">
+                              <p className="text-xs text-muted-foreground mb-2">
+                                Enviada em: {mensagem.data}
+                              </p>
+                              <p className="text-sm leading-relaxed">
+                                {mensagem.texto}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Alerta sobre limite de 15 dias */}
+                    {relatoEncontrado.status === "pendente" && (
+                      <div className="flex items-start gap-3 rounded-2xl border border-orange-400/70 bg-orange-50 p-4 text-sm text-orange-900">
+                        <AlertCircle className="h-5 w-5 text-orange-600 mt-0.5 flex-shrink-0" />
+                        <div>
+                          <p className="font-semibold">Prazo para envio de mensagens</p>
+                          <p>
+                            {podeEnviarMensagem 
+                              ? `Você pode enviar mensagens até 15 dias após o envio do relato. Restam ${15 - diasPassados} dias.`
+                              : "O prazo de 15 dias para envio de mensagens já expirou. Para novos apontamentos, abra um novo protocolo."
+                            }
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
                     {/* Botão para enviar mensagem/resposta */}
                     {relatoEncontrado.status === "pendente" ? (
                       <div className="flex justify-center pt-4">
                         <Button
                           onClick={() => setShowResponseDialog(true)}
-                          className="bg-white hover:bg-white/90 text-primary font-semibold px-8 py-6 flex items-center gap-2"
+                          disabled={!podeEnviarMensagem}
+                          className="bg-white hover:bg-white/90 text-primary font-semibold px-8 py-6 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           <MessageSquare className="h-5 w-5" />
                           Enviar Mensagem

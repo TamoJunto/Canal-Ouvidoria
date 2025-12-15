@@ -4,8 +4,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useState } from "react"
-import { AlertTriangle, ChevronLeft, Mail, Clock, Check, MessageSquare, RotateCcw, FileText } from "lucide-react"
+import { AlertTriangle, ChevronLeft, Mail, Clock, Check, MessageSquare, RotateCcw, FileText, Home, Info } from "lucide-react"
+import { useNavigate } from "react-router-dom"
 
 const mockRelatos = [
   // --- 6 NOVOS ---
@@ -257,8 +259,10 @@ interface Comment {
 }
 
 export default function RelatosPage() {
+  const navigate = useNavigate()
   const [statusFilter, setStatusFilter] = useState("nova")
   const [comiteFilter, setComiteFilter] = useState("Comitê 1")
+  const [tipoRelatoFilter, setTipoRelatoFilter] = useState("Todos")
   const [selectedRelato, setSelectedRelato] = useState<number | null>(null)
   const [showTransferDialog, setShowTransferDialog] = useState(false)
   const [showResponseDialog, setShowResponseDialog] = useState(false)
@@ -323,7 +327,11 @@ export default function RelatosPage() {
     18: "Funcionário desligado após investigação confirmar conflito de interesses. Processo de aprovação de pagamentos foi revisado e novas salvaguardas implementadas."
   })
 
-  const filteredRelatos = mockRelatos.filter((r) => r.status === statusFilter)
+  const filteredRelatos = mockRelatos.filter((r) => {
+    const matchStatus = r.status === statusFilter
+    const matchTipo = tipoRelatoFilter === "Todos" || r.categoria === tipoRelatoFilter
+    return matchStatus && matchTipo
+  })
   const detailedRelato = mockRelatos.find((r) => r.id === selectedRelato)
 
   return (
@@ -332,6 +340,13 @@ export default function RelatosPage() {
       <main className="flex flex-col items-center px-4 py-8">
         {!selectedRelato ? (
           <div className="w-full max-w-7xl">
+            <button
+              onClick={() => navigate("/admin")}
+              className="flex items-center gap-2 text-foreground hover:text-primary mb-6 transition-colors"
+            >
+              <ChevronLeft className="h-5 w-5" />
+              <span className="font-medium">Voltar</span>
+            </button>
             <div className="bg-primary rounded-t-3xl p-6">
               <div className="flex gap-4 mb-6">
                 <Button
@@ -361,20 +376,42 @@ export default function RelatosPage() {
             <div className="bg-white border-4 border-primary rounded-b-3xl p-8">
               <div className="flex justify-between items-center mb-6">
                 <h1 className="text-4xl font-bold">Relatos</h1>
-                <div className="flex flex-col items-end">
-                  <span className="text-sm text-muted-foreground mb-1">Comitês</span>
-                  <Select value={comiteFilter} onValueChange={setComiteFilter}>
-                    <SelectTrigger className="w-48">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Comitê 1">Comitê 1</SelectItem>
-                      <SelectItem value="Comitê 2">Comitê 2</SelectItem>
-                      <SelectItem value="Comitê 3">Comitê 3</SelectItem>
-                      <SelectItem value="Comitê 4">Comitê 4</SelectItem>
-                      <SelectItem value="Comitê 5">Comitê 5</SelectItem>
-                    </SelectContent>
-                  </Select>
+                <div className="flex gap-4 items-end">
+                  <div className="flex flex-col items-end">
+                    <span className="text-sm text-muted-foreground mb-1">Tipo de Relato</span>
+                    <Select value={tipoRelatoFilter} onValueChange={setTipoRelatoFilter}>
+                      <SelectTrigger className="w-56">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Todos">Todos os tipos</SelectItem>
+                        <SelectItem value="ASSÉDIO MORAL">Assédio Moral</SelectItem>
+                        <SelectItem value="ASSÉDIO SEXUAL">Assédio Sexual</SelectItem>
+                        <SelectItem value="AMEAÇA / AGRESSÃO">Ameaça / Agressão</SelectItem>
+                        <SelectItem value="CONFLITO DE INTERESSES">Conflito de Interesses</SelectItem>
+                        <SelectItem value="DISCRIMINAÇÃO">Discriminação</SelectItem>
+                        <SelectItem value="FRAUDE">Fraude</SelectItem>
+                        <SelectItem value="SAUDE E SEGURANÇA">Saúde e Segurança</SelectItem>
+                        <SelectItem value="VAZAMENTO DE DADOS">Vazamento de Dados</SelectItem>
+                        <SelectItem value="OUTROS (Uso Indevido)">Outros</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex flex-col items-end">
+                    <span className="text-sm text-muted-foreground mb-1">Comitês</span>
+                    <Select value={comiteFilter} onValueChange={setComiteFilter}>
+                      <SelectTrigger className="w-48">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Comitê 1">Comitê 1</SelectItem>
+                        <SelectItem value="Comitê 2">Comitê 2</SelectItem>
+                        <SelectItem value="Comitê 3">Comitê 3</SelectItem>
+                        <SelectItem value="Comitê 4">Comitê 4</SelectItem>
+                        <SelectItem value="Comitê 5">Comitê 5</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               </div>
 
@@ -400,13 +437,22 @@ export default function RelatosPage() {
           </div>
         ) : (
           <div className="w-full max-w-5xl">
-            <button
-              onClick={() => setSelectedRelato(null)}
-              className="flex items-center gap-2 text-foreground hover:text-primary mb-6 transition-colors"
-            >
-              <ChevronLeft className="h-5 w-5" />
-              <span className="font-medium">Voltar</span>
-            </button>
+            <div className="flex items-center justify-between mb-6">
+              <button
+                onClick={() => setSelectedRelato(null)}
+                className="flex items-center gap-2 text-foreground hover:text-primary transition-colors"
+              >
+                <ChevronLeft className="h-5 w-5" />
+                <span className="font-medium">Voltar</span>
+              </button>
+              <button
+                onClick={() => navigate("/admin")}
+                className="flex items-center gap-2 text-foreground hover:text-primary transition-colors"
+              >
+                <Home className="h-5 w-5" />
+                <span className="font-medium">Ir para Home</span>
+              </button>
+            </div>
 
             <h1 className="text-4xl font-bold mb-8">Relatos</h1>
 
@@ -526,7 +572,7 @@ export default function RelatosPage() {
                       onClick={() => setShowResponseDialog(true)}
                       className="bg-primary hover:bg-primary/90 text-white px-8"
                     >
-                      Responder
+                      Responder e Finalizar
                     </Button>
                   </>
                 )}
@@ -571,7 +617,7 @@ export default function RelatosPage() {
       <Dialog open={showResponseDialog} onOpenChange={setShowResponseDialog}>
         <DialogContent className="max-w-2xl rounded-3xl border-4 border-primary p-8">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold text-center mb-6">Responder</DialogTitle>
+             <DialogTitle className="text-2xl font-bold text-center mb-6">Responder e Finalizar</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div className="flex items-start gap-3 rounded-2xl border border-yellow-400/70 bg-yellow-50 p-4 text-sm text-yellow-900">
@@ -585,9 +631,23 @@ export default function RelatosPage() {
               <Label className="text-base font-semibold">Mensagem</Label>
               <Textarea className="mt-2 min-h-32" placeholder="Digite sua resposta..." />
             </div>
+            <div>
+              <Label className="text-base font-semibold">Anexar Arquivo (opcional)</Label>
+              <div className="mt-2">
+                <input
+                  type="file"
+                  multiple
+                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary/90 cursor-pointer"
+                  accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.xls,.xlsx"
+                />
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Formatos aceitos: PDF, DOC, DOCX, JPG, PNG, XLS, XLSX (máx. 10MB por arquivo)
+                </p>
+              </div>
+            </div>
             <Button className="w-full bg-primary hover:bg-primary/90 text-white"
             onClick={() => setShowResponseDialog(false)}
-            >Enviar Resposta</Button>
+            >Enviar Resposta e Finalizar</Button>
           </div>
         </DialogContent>
       </Dialog>
@@ -638,9 +698,23 @@ export default function RelatosPage() {
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label className="text-base font-semibold">Comentário</Label>
+              <div className="flex items-center gap-2 mb-2">
+                <Label className="text-base font-semibold">Comentário</Label>
+                <TooltipProvider>
+                  <Tooltip delayDuration={300}>
+                    <TooltipTrigger asChild>
+                      <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent side="right" className="max-w-xs">
+                      <p className="text-sm">
+                        <strong>Comunicação interna:</strong> Este comentário é apenas para registro interno e comunicação entre a equipe. O denunciante não verá esta mensagem.
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
               <Textarea 
-                className="mt-2 min-h-32" 
+                className="min-h-32" 
                 placeholder="Descreva como está indo o tratamento da denúncia, atualizações, próximos passos, etc..." 
                 value={commentText}
                 onChange={(e) => setCommentText(e.target.value)}

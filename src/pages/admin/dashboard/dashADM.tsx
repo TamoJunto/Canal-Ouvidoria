@@ -2,7 +2,7 @@ import { useMemo, useState } from "react"
 import { HeaderAdmin } from "@/components/headerAdmin"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Download, Calendar as CalendarIcon, BarChart3, TrendingUp, TrendingDown, Loader2, X } from "lucide-react"
+import { Download, Calendar as CalendarIcon, BarChart3, TrendingUp, TrendingDown, Loader2, X, ChevronLeft, Filter } from "lucide-react"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 import { useDashboard } from "@/hooks/useDashboard"
 import type { DashboardPeriod } from "@/types/dashboard"
@@ -10,22 +10,28 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Calendar } from "@/components/ui/calendar"
 import type { DateRange as DateRangeType } from "react-day-picker"
+import { useNavigate } from "react-router-dom"
 
 export default function DashboardPage() {
+  const navigate = useNavigate()
   const [groupBy, setGroupBy] = useState<DashboardPeriod>("semana")
+  const [tipoOcorrencia, setTipoOcorrencia] = useState<string>("Todos")
   const [dateRange, setDateRange] = useState<DateRangeType | undefined>()
   const [isPopoverOpen, setIsPopoverOpen] = useState(false)
+  const [isTipoPopoverOpen, setIsTipoPopoverOpen] = useState(false)
   // Estado temporário para o calendário
   const [tempDateRange, setTempDateRange] = useState<DateRangeType | undefined>()
 
   const filters = useMemo(
     () => ({
       groupBy,
+      tipoOcorrencia: tipoOcorrencia !== "Todos" ? tipoOcorrencia : undefined,
       dataInicio: dateRange?.from?.toISOString(),
       dataFim: dateRange?.to?.toISOString(),
     }),
     [
       groupBy,
+      tipoOcorrencia,
       dateRange?.from?.getTime(),
       dateRange?.to?.getTime(),
     ]
@@ -60,6 +66,8 @@ export default function DashboardPage() {
       : data?.periodo.inicio && data?.periodo.fim
         ? `${data.periodo.inicio} - ${data.periodo.fim}`
         : "Selecione um período"
+
+  const tipoOcorrenciaLabel = tipoOcorrencia === "Todos" ? "Todos os tipos" : tipoOcorrencia
 
   // Função para aplicar o filtro
   const handleApplyFilter = () => {
@@ -120,9 +128,17 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-background">
+      
       <HeaderAdmin />
       <main className="flex flex-col items-center px-4 py-8">
         <div className="w-full max-w-7xl">
+          <button
+            onClick={() => navigate("/admin")}
+            className="flex items-center gap-2 text-foreground hover:text-primary mb-6 transition-colors"
+          >
+            <ChevronLeft className="h-5 w-5" />
+            <span className="font-medium">Voltar</span>
+          </button>
           <div className="bg-primary rounded-t-3xl p-8 overflow-visible">
             <div className="flex justify-between items-center mb-8">
               <h1 className="text-3xl font-bold text-white">Dashboard</h1>
@@ -300,6 +316,58 @@ export default function DashboardPage() {
                     </div>
                   </PopoverContent>
                 </Popover>
+                <Popover open={isTipoPopoverOpen} onOpenChange={setIsTipoPopoverOpen}>
+                  <PopoverTrigger asChild>
+                    <Button 
+                      type="button"
+                      className="bg-white hover:bg-white/90 text-primary gap-2 flex-col h-auto py-2"
+                    >
+                      <div className="flex items-center gap-2">
+                        <Filter className="h-4 w-4" />
+                        <span>Tipo Ocorrência</span>
+                      </div>
+                      <span className="text-xs text-muted-foreground">
+                        {tipoOcorrenciaLabel}
+                      </span>
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent 
+                    className="w-80 p-4 !z-[9999] bg-white shadow-xl border-2" 
+                    align="end"
+                    sideOffset={8}
+                  >
+                    <div className="space-y-3">
+                      <div className="text-sm font-semibold mb-2">Selecione o tipo de ocorrência</div>
+                      <div className="grid gap-2">
+                        {[
+                          { value: "Todos", label: "Todos os tipos" },
+                          { value: "ASSÉDIO MORAL", label: "Assédio Moral" },
+                          { value: "ASSÉDIO SEXUAL", label: "Assédio Sexual" },
+                          { value: "AMEAÇA / AGRESSÃO", label: "Ameaça / Agressão" },
+                          { value: "CONFLITO DE INTERESSES", label: "Conflito de Interesses" },
+                          { value: "DISCRIMINAÇÃO", label: "Discriminação" },
+                          { value: "FRAUDE", label: "Fraude" },
+                          { value: "SAUDE E SEGURANÇA", label: "Saúde e Segurança" },
+                          { value: "VAZAMENTO DE DADOS", label: "Vazamento de Dados" },
+                          { value: "OUTROS", label: "Outros" },
+                        ].map((tipo) => (
+                          <Button
+                            key={tipo.value}
+                            variant={tipoOcorrencia === tipo.value ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => {
+                              setTipoOcorrencia(tipo.value)
+                              setIsTipoPopoverOpen(false)
+                            }}
+                            className={tipoOcorrencia === tipo.value ? "bg-primary" : ""}
+                          >
+                            {tipo.label}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                  </PopoverContent>
+                </Popover>
               </div>
             </div>
 
@@ -468,19 +536,6 @@ export default function DashboardPage() {
 
           <div className="bg-accent rounded-b-3xl p-8 border-4 border-t-0 border-primary">
             <div className="bg-white rounded-2xl p-8">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold">Gráfico</h2>
-                <Select value={groupBy} onValueChange={(value) => setGroupBy(value as DashboardPeriod)}>
-                  <SelectTrigger className="w-40">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="semana">Semana</SelectItem>
-                    <SelectItem value="mes">Mês</SelectItem>
-                    <SelectItem value="ano">Ano</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
               {loading ? (
                 <div className="flex items-center justify-center h-[300px]">
                   <Loader2 className="h-8 w-8 animate-spin text-primary" />

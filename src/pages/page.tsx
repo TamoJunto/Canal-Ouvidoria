@@ -10,12 +10,13 @@ export default function Home() {
       <main className="flex flex-col items-center justify-center px-8 py-24 md:py-32">
         <div className="max-w-4xl text-center space-y-12">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-tight text-balance">
-            Bem-vindo ao site da ouvidoria
+            Você está no Canal de Relatos da Aliança Empreendedora.
             <br />
-            do Grupo Aliança Empreendedora
+            
           </h1>
+          <h3 className="text-lg text-foreground text-balance"> Aqui você pode enviar seus relatos de forma segura e confidencial.</h3>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-8">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-8 mt-10">
             <Link to="/faca-seu-relato">
               <Button
                 size="lg"

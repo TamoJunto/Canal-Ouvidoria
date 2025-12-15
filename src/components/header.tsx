@@ -50,7 +50,7 @@ export function Header() {
     { to: "/", label: "INÍCIO" },
     { to: "/duvidas-frequentes", label: "DÚVIDAS FREQUENTES" },
     { to: "/codigo-de-etica", label: "CÓDIGO DE ÉTICA" },
-    { to: "/regras", label: "REGRAS" },
+    { to: "/regras", label: "Políticas adicionais" },
   ]
 
   const handleNavigate = (to: string) => {

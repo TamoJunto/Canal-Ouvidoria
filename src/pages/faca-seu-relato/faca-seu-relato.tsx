@@ -43,17 +43,23 @@ export default function FacaSeuRelato() {
   }
   const descricoesRelato: Record<string, string> = {
     "comportamento-inadequado":
-      "Ações ou atitudes que fogem dos valores e condutas esperadas em relações estabelecidas com e/ou pela Aliança Empreendedora.",
+      "Situações de conduta imprópria que desrespeitam pessoas, normas internas ou o ambiente de trabalho.",
+    
     "assedio-moral-abuso-poder":
-      "Situações em que alguém é exposto(a) a humilhações, intimidações ou uso indevido de autoridade.",
+      "Quando alguém sofre constrangimento, humilhação ou pressão excessiva que cause prejuízo emocional.",
+    
     "conflito-interesses":
-      "Quando decisões ou ações pessoais podem interferir nos interesses da organização.",
+      "Quando decisões ou ações pessoais podem influenciar, comprometer ou beneficiar indevidamente atividades profissionais.",
+    
     "corrupcao":
-      "Práticas que envolvem favorecimento indevido, suborno, fraude ou uso indevido de recursos.",
+      "Práticas como suborno, favorecimento, fraude ou qualquer ato que viole princípios de integridade e transparência.",
+    
     "assedio-sexual":
-      "Avanços, comentários ou atitudes de cunho sexual sem consentimento, que causem constrangimento.",
+      "Qualquer comportamento ou abordagem de caráter sexual que cause desconforto, constrangimento ou violação de limites pessoais.",
+   
     "preconceito-discriminacao":
-      "Tratamento desigual ou ofensivo baseado em gênero, raça, idade, religião, orientação sexual, deficiência ou outras características pessoais.",
+      "Atitudes, falas ou ações que excluam, desrespeitem ou violem alguém por características pessoais ou identitárias.",
+    
     "outros":
       "Situações não contempladas nas categorias anteriores, mas que você considera importante relatar."
   }
@@ -232,7 +238,7 @@ export default function FacaSeuRelato() {
               <div className="space-y-3">
                 <Label className="text-white text-sm font-medium">Quem são as pessoas e/ou empresas envolvidas?</Label>
                 <Textarea
-                  placeholder="Descreva a sua denúncia de forma clara e direta..."
+                  placeholder="Descreva quem são as pessoas e/ou empresas envolvidas..."
                   className="bg-white border-0 text-foreground min-h-[100px] resize-none"
                   required
                 />
@@ -255,6 +261,12 @@ export default function FacaSeuRelato() {
                     </Label>
                   </div>
                 </RadioGroup>
+
+                {evidencias === "sim" && (
+                  <p className="text-white text-sm font-medium">
+                    Após clicar em "Prosseguir" ao final do preenchimento do Relato, solicitamos que você anexe ao registro as evidências que possui
+                  </p>
+                )}
               </div>
 
               {/* Conhecimento dos Fatos */}
@@ -263,7 +275,7 @@ export default function FacaSeuRelato() {
                   Além de você, quem mais tem conhecimento dos fatos?;
                 </Label>
                 <Textarea
-                  placeholder="Descreva a sua denúncia de forma clara e direta..."
+                  placeholder="Descreva quem mais tem conhecimento dos fatos..."
                   className="bg-white border-0 text-foreground min-h-[80px] resize-none"
                 />
               </div>
@@ -287,12 +299,20 @@ export default function FacaSeuRelato() {
                   <Checkbox
                     id="lgpd"
                     checked={lgpdAccepted}
-                    onCheckedChange={(checked) => setLgpdAccepted(checked as boolean)}
+                    onCheckedChange={(checked) => {
+                      if (checked) {
+                        // Abre o modal para confirmar
+                        setShowLgpdModal(true)
+                      } else {
+                        // Se desmarcar, apenas desmarca
+                        setLgpdAccepted(false)
+                      }
+                    }}
                     className="border-white data-[state=checked]:bg-white data-[state=checked]:text-white mt-1"
                     required
                   />
                   <Label htmlFor="lgpd" className="text-white text-sm cursor-pointer leading-relaxed">
-                    LGPD
+                    Li e concordo com os termos da LGPD
                   </Label>
                 </div>
               </div>
@@ -313,7 +333,13 @@ export default function FacaSeuRelato() {
         </div>
       </main>
 
-      <Dialog open={showLgpdModal} onOpenChange={setShowLgpdModal}>
+      <Dialog open={showLgpdModal} onOpenChange={(open) => {
+        if (!open) {
+          // Se fechar o modal sem confirmar, desmarca o checkbox
+          setLgpdAccepted(false)
+        }
+        setShowLgpdModal(open)
+      }}>
         <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto bg-primary text-white border-0">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold text-accent">Política de proteção de dados</DialogTitle>
@@ -353,6 +379,18 @@ export default function FacaSeuRelato() {
                 organização.
               </p>
             </div>
+          </div>
+          
+          <div className="flex justify-center pt-4">
+            <Button
+              onClick={() => {
+                setLgpdAccepted(true)
+                setShowLgpdModal(false)
+              }}
+              className="bg-accent hover:bg-accent/90 text-black font-semibold uppercase tracking-wide px-12 py-3"
+            >
+              Li e concordo
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
