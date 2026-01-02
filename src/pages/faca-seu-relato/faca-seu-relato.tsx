@@ -10,6 +10,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { relatosPublicApi } from "@/services"
+import { Loader2 } from "lucide-react"
 
 export default function FacaSeuRelato() {
   const navigate = useNavigate()
@@ -22,23 +24,72 @@ export default function FacaSeuRelato() {
   const [celular, setCelular] = useState("")
   const [contatoEmail, setContatoEmail] = useState("")
   const [anonEmail, setAnonEmail] = useState("")
-  
+  const [nomeCompleto, setNomeCompleto] = useState("")
+  const [descricaoRelato, setDescricaoRelato] = useState("")
+  const [pessoasEnvolvidas, setPessoasEnvolvidas] = useState("")
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
 
+  const tipoRelatoMap: Record<string, string> = {
+    "comportamento-inadequado": "COMPORTAMENTO_INADEQUADO",
+    "assedio-moral-abuso-poder": "ASSEDIO_MORAL",
+    "conflito-interesses": "CONFLITO_INTERESSES",
+    "corrupcao": "CORRUPCAO",
+    "assedio-sexual": "ASSEDIO_SEXUAL",
+    "preconceito-discriminacao": "PRECONCEITO_DISCRIMINACAO",
+    "outros": "OUTROS",
+  }
 
-
-
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
-    const naoSeIdentificou = identificar === "nao"
-    const receberProtocoloPorEmail =
-      identificar === "sim"
-        ? contatoEmail.trim().length > 0
-        : anonEmail.trim().length > 0
+    setLoading(true)
+    setError("")
+
+    try {
+      const isAnonymous = identificar === "nao"
+      const email = isAnonymous ? anonEmail : contatoEmail
+      
+      const tipoBackend = tipoRelatoMap[tipoRelato] || "OUTROS"
+      
+      const relato = await relatosPublicApi.createRelato({
+        type: tipoBackend as any,
+        description: descricaoRelato,
+        is_anonymous: isAnonymous,
+        name: isAnonymous ? undefined : nomeCompleto,
+        contact_email: email || undefined,
+        contact_phone: isAnonymous ? undefined : celular,
+        involved_people: pessoasEnvolvidas || undefined,
+        has_evidence: evidencias === "sim",
+      })
+
+      console.log('Relato criado com sucesso:', relato)
     
     if (evidencias === "sim") {
-      navigate("/faca-seu-relato/anexos", { state: { naoSeIdentificou, receberProtocoloPorEmail } })
+        navigate("/faca-seu-relato/anexos", { 
+          state: { 
+            protocol: relato.protocol,
+            naoSeIdentificou: isAnonymous,
+            receberProtocoloPorEmail: !!email
+          } 
+        })
     } else {
-      navigate("/faca-seu-relato/relatofeito", { state: { naoSeIdentificou, receberProtocoloPorEmail } })
+        navigate("/faca-seu-relato/relatofeito", { 
+          state: { 
+            protocol: relato.protocol,
+            naoSeIdentificou: isAnonymous,
+            receberProtocoloPorEmail: !!email
+          } 
+        })
+      }
+    } catch (err: any) {
+      console.error('Erro ao criar relato:', err)
+      setError(
+        err.response?.data?.message || 
+        err.message || 
+        'Erro ao criar relato. Tente novamente.'
+      )
+    } finally {
+      setLoading(false)
     }
   }
   const descricoesRelato: Record<string, string> = {
@@ -99,10 +150,14 @@ export default function FacaSeuRelato() {
                 <>
                   <div className="space-y-3">
                     <Label className="text-white text-sm font-medium">Nome Completo</Label>
-                    <Input type="text"  
+                    <Input 
+                      type="text"  
                     placeholder="Ex: João Silva" 
                     className="bg-white border-0 text-foreground" 
-                    required />
+                      value={nomeCompleto}
+                      onChange={(e) => setNomeCompleto(e.target.value)}
+                      required 
+                    />
                   </div>
 
                   <div className="space-y-3">
@@ -228,8 +283,10 @@ export default function FacaSeuRelato() {
               <div className="space-y-3">
                 <Label className="text-white text-sm font-medium">Sobre o que você gostaria de falar/relatar?</Label>
                 <Textarea
-                  placeholder="Descreva a sua denúncia de forma clara e direta..."
+                  placeholder="Descreva a sua denúncia de forma clara e direta (mínimo 10 caracteres)..."
                   className="bg-white border-0 text-foreground min-h-[100px] resize-none"
+                  value={descricaoRelato}
+                  onChange={(e) => setDescricaoRelato(e.target.value)}
                   required
                 />
               </div>
@@ -240,6 +297,8 @@ export default function FacaSeuRelato() {
                 <Textarea
                   placeholder="Descreva quem são as pessoas e/ou empresas envolvidas..."
                   className="bg-white border-0 text-foreground min-h-[100px] resize-none"
+                  value={pessoasEnvolvidas}
+                  onChange={(e) => setPessoasEnvolvidas(e.target.value)}
                   required
                 />
               </div>
@@ -317,13 +376,28 @@ export default function FacaSeuRelato() {
                 </div>
               </div>
 
+              {/* Mensagem de Erro */}
+              {error && (
+                <div className="bg-red-500 text-white p-4 rounded-lg">
+                  {error}
+                </div>
+              )}
+
               {/* Botão Prosseguir */}
               <div className="flex items-center justify-between pt-4">
                 <Button
                   type="submit"
+                  disabled={loading}
                   className="bg-white hover:bg-white/90 text-primary font-semibold uppercase tracking-wide px-12 py-6"
                 >
-                  Prosseguir
+                  {loading ? (
+                    <>
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                      Enviando...
+                    </>
+                  ) : (
+                    'Prosseguir'
+                  )}
                 </Button>
 
                 <span className="text-white text-4xl font-light">1</span>

@@ -11,7 +11,7 @@ export function HeaderAdmin() {
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <Link to="/" className="flex items-center">
           <img 
-            src="https://aliancaempreendedora.org.br/wp-content/uploads/2024/02/logo-ae-text-white-v2024.svg" 
+            src="https://prod-cms-us-east-1-uploads.s3.us-east-1.amazonaws.com/logo_ae_text_white_v2024_1_37365009bd.svg" 
             alt="Aliança Empreendedora" 
             className="h-12 w-auto"
           />

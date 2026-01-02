@@ -5,334 +5,170 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { useState } from "react"
-import { AlertTriangle, ChevronLeft, Mail, Clock, Check, MessageSquare, RotateCcw, FileText, Home, Info } from "lucide-react"
+import { useState, useEffect } from "react"
+import { AlertTriangle, ChevronLeft, Mail, Clock, Check, MessageSquare, RotateCcw, Info, Loader2, Download, Paperclip, X } from "lucide-react"
 import { useNavigate } from "react-router-dom"
-
-const mockRelatos = [
-  // --- 6 NOVOS ---
-  {
-    id: 1,
-    categoria: "ASSÉDIO MORAL",
-    descricao:
-      "O gerente da área de Vendas, Sr. Silva, humilha a equipe em reuniões, usando palavras de baixo calão e fazendo ameaças constantes de demissão se as metas não forem batidas.",
-    evidencias: "Tenho uma gravação de áudio da última reunião (anexo).",
-    envolvidos: "", // Caso Anônimo (Email Apenas)
-    relacao: "", // Caso Anônimo (Email Apenas)
-    quemsabe: "", // Caso Anônimo (Email Apenas)
-    email: "equipe.vendas.desgastada@email.com",
-    data: "14/11/2025",
-    status: "nova",
-  },
-  {
-    id: 2,
-    categoria: "SAUDE E SEGURANÇA",
-    descricao:
-      "A máquina de prensa 03 está sem a grade de proteção obrigatória. A trava de segurança foi 'amarrada' para produzir mais rápido. Um operador quase perdeu a mão hoje.",
-    evidencias: "Fotos da máquina e da 'gambiarra' na trava.",
-    envolvidos: "Supervisor de Produção (Carlos)",
-    relacao: "Operador de Máquina (Turno B)",
-    quemsabe: "Toda a equipe do Turno B sabe, mas tem medo de falar.",
-    email: "operador.seguro@email.com",
-    data: "13/11/2025",
-    status: "nova",
-  },
-  {
-    id: 3,
-    categoria: "FRAUDE",
-    descricao:
-      "Estão inflando as notas de despesa de viagem. O valor do hotel da última viagem do diretor foi o dobro do que realmente custou. A secretária está lançando as notas 'corrigidas'.",
-    evidencias: "Sem evidências, mas podem checar a Nota Fiscal 12345 da viagem para Recife.",
-    envolvidos: "", // Caso Totalmente Anônimo
-    relacao: "", // Caso Totalmente Anônimo
-    quemsabe: "", // Caso Totalmente Anônimo
-    email: "", // Caso Totalmente Anônimo
-    data: "12/11/2025",
-    status: "nova",
-  },
-  {
-    id: 4,
-    categoria: "DISCRIMINAÇÃO",
-    descricao:
-      "Durante o processo seletivo para vaga de Analista Sr., ouvi o recrutador dizer que 'não contrataria aquela candidata porque ela acabou de casar e logo vai querer engravidar'.",
-    evidencias: "Sem evidências, foi uma conversa de corredor.",
-    envolvidos: "Recrutador (João) e Gerente (Mariana)",
-    relacao: "Analista de RH",
-    quemsabe: "Apenas eu ouvi.",
-    email: "rh.consciente@email.com",
-    data: "11/11/2025",
-    status: "nova",
-  },
-  {
-    id: 5,
-    categoria: "CONFLITO DE INTERESSES",
-    descricao:
-      "O processo de licitação para o novo software de RH está sendo direcionado para a empresa 'SoftTech'. Descobri que essa empresa pertence ao cunhado da gerente de RH.",
-    evidencias: "E-mails internos direcionando a escolha antes mesmo da cotação.",
-    envolvidos: "", // Caso Anônimo (Email Apenas)
-    relacao: "", // Caso Anônimo (Email Apenas)
-    quemsabe: "", // Caso Anônimo (Email Apenas)
-    email: "analista.ti.correto@email.com",
-    data: "10/11/2025",
-    status: "nova",
-  },
-  {
-    id: 6,
-    categoria: "VAZAMENTO DE DADOS",
-    descricao:
-      "A lista de e-mails e CPFs de todos os clientes premium está disponível em uma pasta pública na rede interna (\\\\server\\public\\clientes_premium.xls), sem proteção alguma.",
-    evidencias: "O caminho da pasta está na descrição.",
-    envolvidos: "", // Caso Totalmente Anônimo
-    relacao: "", // Caso Totalmente Anônimo
-    quemsabe: "", // Caso Totalmente Anônimo
-    email: "", // Caso Totalmente Anônimo
-    data: "09/11/2025",
-    status: "nova",
-  },
-
-  // --- 6 EM ANDAMENTO ---
-  {
-    id: 7,
-    categoria: "AMEAÇA / AGRESSÃO",
-    descricao:
-      "Um funcionário do time de logística ameaçou um motorista terceirizado no pátio, dizendo que 'ia pegar ele lá fora' porque ele demorou para manobrar.",
-    evidencias: "A câmera 04 do pátio deve ter gravado a discussão.",
-    envolvidos: "", // Caso Anônimo (Email Apenas)
-    relacao: "", // Caso Anônimo (Email Apenas)
-    quemsabe: "", // Caso Anônimo (Email Apenas)
-    email: "seguranca.patrimonial@email.com",
-    data: "05/11/2025",
-    status: "andamento",
-  },
-  {
-    id: 8,
-    categoria: "ASSÉDIO SEXUAL",
-    descricao:
-      "Meu coordenador (Marcos) vive fazendo 'elogios' ao meu corpo e me chamando para 'happy hour' só nós dois, mesmo eu já tendo dito não. Hoje ele tocou meu ombro e desceu a mão nas minhas costas.",
-    evidencias: "Tenho prints de mensagens dele no Teams.",
-    envolvidos: "Coordenador Marcos P.",
-    relacao: "Estagiária",
-    quemsabe: "Minha colega de baia (Juliana) viu a cena de hoje.",
-    email: "estagiaria.constrangida@email.com",
-    data: "04/11/2025",
-    status: "andamento",
-  },
-  {
-    id: 9,
-    categoria: "FRAUDE",
-    descricao:
-      "O ponto eletrônico está sendo batido por outra pessoa para cobrir faltas de um funcionário do financeiro. O 'amigo' bate o ponto para ele às 8h, mas ele só chega às 10h.",
-    evidencias: "Podem puxar as câmeras da entrada às 8h e comparar com o login.",
-    envolvidos: "", // Caso Totalmente Anônimo
-    relacao: "", // Caso Totalmente Anônimo
-    quemsabe: "", // Caso Totalmente Anônimo
-    email: "", // Caso Totalmente Anônimo
-    data: "03/11/2025",
-    status: "andamento",
-  },
-  {
-    id: 10,
-    categoria: "SAUDE E SEGURANÇA",
-    descricao:
-      "Fiação exposta no corredor do segundo andar, perto da máquina de café. Já deu curto-circuito duas vezes essa semana. Alguém vai tomar um choque.",
-    evidencias: "Foto anexa.",
-    envolvidos: "", // Caso Anônimo (Email Apenas)
-    relacao: "", // Caso Anônimo (Email Apenas)
-    quemsabe: "", // Caso Anônimo (Email Apenas)
-    email: "alerta.manutencao@email.com",
-    data: "01/11/2025",
-    status: "andamento",
-  },
-  {
-    id: 11,
-    categoria: "OUTROS (Uso Indevido)",
-    descricao:
-      "O carro da empresa (Placa ABC-1234, modelo Onix) está sendo usado para fins pessoais pelo gerente de contas todo fim de semana. Ele leva os filhos na praia com o carro.",
-    evidencias: "Vi o carro no estacionamento de um shopping no sábado.",
-    envolvidos: "Gerente de Contas (Fábio)",
-    relacao: "Analista de Frota",
-    quemsabe: "Se puxarem o rastreador GPS, vão confirmar.",
-    email: "controle.frota@email.com",
-    data: "30/10/2025",
-    status: "andamento",
-  },
-  {
-    id: 12,
-    categoria: "ASSÉDIO MORAL",
-    descricao:
-      "A liderança da equipe de TI está sobrecarregando um funcionário específico de propósito, tirando ele de projetos e passando tarefas operacionais repetitivas, para forçar ele a pedir demissão.",
-    evidencias: "Basta ver o histórico de alocação de tarefas dele no Jira dos últimos 3 meses.",
-    envolvidos: "", // Caso Totalmente Anônimo
-    relacao: "", // Caso Totalmente Anônimo
-    quemsabe: "", // Caso Totalmente Anônimo
-    email: "", // Caso Totalmente Anônimo
-    data: "28/10/2025",
-    status: "andamento",
-  },
-
-  // --- 6 FINALIZADOS ---
-  {
-    id: 13,
-    categoria: "FRAUDE (Suborno)",
-    descricao:
-      "Recebemos um fornecedor que nos ofereceu 5% de comissão 'por fora' para ganhar a concorrência. (Investigação concluída, fornecedor bloqueado e política reforçada).",
-    evidencias: "Proposta de e-mail do fornecedor.",
-    envolvidos: "", // Caso Anônimo (Email Apenas)
-    relacao: "", // Caso Anônimo (Email Apenas)
-    quemsabe: "", // Caso Anônimo (Email Apenas)
-    email: "compras.compliance@email.com",
-    data: "15/10/2025",
-    status: "finalizado",
-  },
-  {
-    id: 14,
-    categoria: "AMEAÇA / AGRESSÃO",
-    descricao:
-      "Discussão entre dois colegas que escalou para agressão verbal e empurrões. (Medidas disciplinares aplicadas em ambos após análise das câmeras).",
-    evidencias: "Testemunho da equipe e câmeras internas.",
-    envolvidos: "Funcionário A e Funcionário B",
-    relacao: "Líder de Equipe",
-    quemsabe: "Toda a equipe de operações.",
-    email: "lider.equipe@email.com",
-    data: "10/10/2025",
-    status: "finalizado",
-  },
-  {
-    id: 15,
-    categoria: "SAUDE E SEGURANÇA",
-    descricao:
-      "Denúncia sobre falta de EPIs (luvas térmicas) na área da caldeira. (Auditoria realizada, EPIs fornecidos e supervisor treinado).",
-    evidencias: "Sem evidências, apenas relato.",
-    envolvidos: "", // Caso Totalmente Anônimo
-    relacao: "", // Caso Totalmente Anônimo
-    quemsabe: "", // Caso Totalmente Anônimo
-    email: "", // Caso Totalmente Anônimo
-    data: "05/10/2025",
-    status: "finalizado",
-  },
-  {
-    id: 16,
-    categoria: "ASSÉDIO MORAL",
-    descricao:
-      "Líder que fazia piadas constrangedoras sobre a aparência dos subordinados. (Líder passou por treinamento de conduta e foi advertido formalmente).",
-    evidencias: "Relatos de 3 testemunhas.",
-    envolvidos: "", // Caso Anônimo (Email Apenas)
-    relacao: "", // Caso Anônimo (Email Apenas)
-    quemsabe: "", // Caso Anônimo (Email Apenas)
-    email: "nao.aguento.mais@email.com",
-    data: "01/10/2025",
-    status: "finalizado",
-  },
-  {
-    id: 17,
-    categoria: "VAZAMENTO DE DADOS",
-    descricao:
-      "Falha no portal do cliente que permitia, ao trocar o ID na URL, ver dados de outros usuários. (Falha crítica corrigida pela equipe de dev em 2 horas).",
-    evidencias: "Vídeo gravando a tela mostrando a falha.",
-    envolvidos: "Equipe de TI",
-    relacao: "Cliente (Externo)",
-    quemsabe: "N/A",
-    email: "cliente.atento@email.com",
-    data: "28/09/2025",
-    status: "finalizado",
-  },
-  {
-    id: 18,
-    categoria: "CONFLITO DE INTERESSES",
-    descricao:
-      "Funcionário do financeiro aprovando pagamentos para empresa de buffet da própria esposa sem cotação. (Funcionário desligado após investigação).",
-    evidencias: "CNPJ da empresa da esposa e notas fiscais aprovadas.",
-    envolvidos: "", // Caso Totalmente Anônimo
-    relacao: "", // Caso Totalmente Anônimo
-    quemsabe: "", // Caso Totalmente Anônimo
-    email: "", // Caso Totalmente Anônimo
-    data: "20/09/2025",
-    status: "finalizado",
-  },
-];
-
-interface Comment {
-  id: number
-  texto: string
-  data: string
-  autor: string
-}
+import { relatosAuthApi, comitesApi, relatosPublicApi } from "@/services"
+import type { RelatoDetalhado, Comite, Anexo } from "@/services"
 
 export default function RelatosPage() {
   const navigate = useNavigate()
-  const [statusFilter, setStatusFilter] = useState("nova")
-  const [comiteFilter, setComiteFilter] = useState("Comitê 1")
+  const [statusFilter, setStatusFilter] = useState("NOVO")
+  const [comiteFilter, setComiteFilter] = useState<string>("todos")
   const [tipoRelatoFilter, setTipoRelatoFilter] = useState("Todos")
-  const [selectedRelato, setSelectedRelato] = useState<number | null>(null)
+  const [selectedRelato, setSelectedRelato] = useState<string | null>(null)
+
+  // Mapeamento de tipos de relato do Select para valores da API
+  const tipoRelatoMap: Record<string, string | undefined> = {
+    "Todos": undefined,
+    "ASSÉDIO MORAL": "ASSEDIO_MORAL",
+    "ASSÉDIO SEXUAL": "ASSEDIO_SEXUAL",
+    "CONFLITO DE INTERESSES": "CONFLITO_INTERESSES",
+    "DISCRIMINAÇÃO": "PRECONCEITO_DISCRIMINACAO",
+    "FRAUDE": "CORRUPCAO",
+    "COMPORTAMENTO INADEQUADO": "COMPORTAMENTO_INADEQUADO",
+    "OUTROS (Uso Indevido)": "OUTROS",
+  }
   const [showTransferDialog, setShowTransferDialog] = useState(false)
   const [showResponseDialog, setShowResponseDialog] = useState(false)
   const [showCommentDialog, setShowCommentDialog] = useState(false)
   const [showReopenDialog, setShowReopenDialog] = useState(false)
   const [commentText, setCommentText] = useState("")
-  const [comments, setComments] = useState<Record<number, Comment[]>>({
-    // Comentários mockados para demonstração
-    7: [
-      {
-        id: 1,
-        texto: "Iniciamos a investigação. Entrevistamos o funcionário do time de logística e revisamos as gravações da câmera 04.",
-        data: "06/11/2025",
-        autor: "Admin"
-      },
-      {
-        id: 2,
-        texto: "Aguardando depoimento do motorista terceirizado. Previsão de conclusão: 10/11/2025.",
-        data: "07/11/2025",
-        autor: "Admin"
-      }
-    ],
-    8: [
-      {
-        id: 1,
-        texto: "Coordenador foi notificado e afastado preventivamente. Iniciando processo de apuração.",
-        data: "05/11/2025",
-        autor: "Admin"
-      }
-    ],
-    // Comentários para relatos finalizados
-    13: [
-      {
-        id: 1,
-        texto: "Investigação iniciada. Fornecedor foi contatado e proposta de suborno confirmada.",
-        data: "16/10/2025",
-        autor: "Admin"
-      },
-      {
-        id: 2,
-        texto: "Fornecedor bloqueado no sistema. Política de compliance reforçada com toda a equipe de compras.",
-        data: "18/10/2025",
-        autor: "Admin"
-      }
-    ],
-    14: [
-      {
-        id: 1,
-        texto: "Câmeras revisadas. Ambos os funcionários foram identificados e chamados para depoimento.",
-        data: "11/10/2025",
-        autor: "Admin"
-      }
-    ]
-  })
-  const [finalResponses] = useState<Record<number, string>>({
-    // Respostas finais mockadas
-    13: "Investigação concluída. Fornecedor foi bloqueado permanentemente e política de compliance foi reforçada com toda a equipe de compras. Todos os processos de licitação foram revisados.",
-    14: "Medidas disciplinares aplicadas em ambos os funcionários após análise das câmeras. Ambos receberam advertência formal e foram orientados sobre conduta profissional.",
-    15: "Auditoria realizada na área da caldeira. EPIs (luvas térmicas) foram fornecidos imediatamente e o supervisor passou por treinamento obrigatório de segurança.",
-    16: "Líder passou por treinamento de conduta e foi advertido formalmente. Monitoramento contínuo implementado.",
-    17: "Falha crítica corrigida pela equipe de desenvolvimento em 2 horas. Patch de segurança aplicado e testes de penetração realizados.",
-    18: "Funcionário desligado após investigação confirmar conflito de interesses. Processo de aprovação de pagamentos foi revisado e novas salvaguardas implementadas."
-  })
+  const [responseText, setResponseText] = useState("")
+  const [reopenMotivo, setReopenMotivo] = useState("")
+  const [targetComite, setTargetComite] = useState("")
+  const [responseFiles, setResponseFiles] = useState<File[]>([])
+  
+  const [relatos, setRelatos] = useState<RelatoDetalhado[]>([])
+  const [comites, setComites] = useState<Comite[]>([])
+  const [loading, setLoading] = useState(true)
+  const [actionLoading, setActionLoading] = useState(false)
+  const [error, setError] = useState("")
+  const [relatoDetalhado, setRelatoDetalhado] = useState<RelatoDetalhado | null>(null)
+  const [loadingDetalhes, setLoadingDetalhes] = useState(false)
+  const [anexos, setAnexos] = useState<Anexo[]>([])
+  const [loadingAnexos, setLoadingAnexos] = useState(false)
 
-  const filteredRelatos = mockRelatos.filter((r) => {
-    const matchStatus = r.status === statusFilter
-    const matchTipo = tipoRelatoFilter === "Todos" || r.categoria === tipoRelatoFilter
-    return matchStatus && matchTipo
-  })
-  const detailedRelato = mockRelatos.find((r) => r.id === selectedRelato)
+  useEffect(() => {
+    loadComites()
+  }, [])
+
+  useEffect(() => {
+    loadRelatos()
+  }, [statusFilter, tipoRelatoFilter, comiteFilter])
+
+  const loadRelatos = async () => {
+    setLoading(true)
+    setError("")
+    try {
+      // Mapeia o tipo de relato do Select para o valor da API
+      const tipoApi = tipoRelatoMap[tipoRelatoFilter]
+      
+      // Converte comiteFilter (ID do comitê) para número
+      const comiteId = comiteFilter && comiteFilter !== "todos" ? parseInt(comiteFilter) : undefined
+      
+      console.log('Carregando relatos com filtros:', { statusFilter, tipoRelatoFilter, tipoApi, comiteFilter, comiteId })
+      const response = await relatosAuthApi.listarRelatos({
+        status: statusFilter,
+        tipo: tipoApi,
+        comite_id: comiteId,
+      })
+      console.log('Relatos carregados:', response.relatos.length)
+      setRelatos(response.relatos || [])
+    } catch (error: any) {
+      console.error('Erro ao carregar relatos:', error)
+      console.error('Detalhes:', error.response?.data)
+      setError(error.response?.data?.message || 'Erro ao carregar relatos')
+      setRelatos([])
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const loadComites = async () => {
+    try {
+      const data = await comitesApi.listarComites()
+      setComites(data || [])
+    } catch (error: any) {
+      console.error('Erro ao carregar comitês:', error)
+      setComites([])
+    }
+  }
+
+  const loadRelatoDetalhes = async (relatoId: string) => {
+    setLoadingDetalhes(true)
+    try {
+      console.log('Buscando detalhes do relato:', relatoId)
+      const detalhes = await relatosAuthApi.getRelatoDetalhes(relatoId)
+      console.log('Detalhes carregados:', detalhes)
+      console.log('Comentários:', detalhes.comentarios)
+      console.log('Mensagens:', detalhes.mensagens)
+      console.log('Histórico:', detalhes.historico)
+      setRelatoDetalhado(detalhes)
+      
+      // Se possui evidências, busca os anexos
+      if ((detalhes as any)?.possui_evidencias && (detalhes as any)?.protocolo) {
+        loadAnexos((detalhes as any).protocolo)
+      }
+    } catch (error: any) {
+      console.error('ERRO ao carregar detalhes:', error)
+      console.error('Status:', error.response?.status)
+      console.error('Dados:', error.response?.data)
+      alert(error.response?.data?.message || 'Erro ao carregar detalhes do relato')
+      setSelectedRelato(null)
+    } finally {
+      setLoadingDetalhes(false)
+    }
+  }
+
+  const loadAnexos = async (protocolo: string) => {
+    setLoadingAnexos(true)
+    try {
+      console.log('Buscando anexos do protocolo:', protocolo)
+      const anexosData = await relatosPublicApi.getAnexos(protocolo)
+      console.log('Anexos retornados:', anexosData)
+      console.log('Total de anexos:', anexosData?.length)
+      setAnexos(anexosData || [])
+    } catch (error: any) {
+      console.error('Erro ao carregar anexos:', error)
+      console.error('Status:', error.response?.status)
+      console.error('Dados:', error.response?.data)
+      setAnexos([])
+    } finally {
+      setLoadingAnexos(false)
+    }
+  }
+
+  const handleDownloadAnexo = async (anexoId: number, nomeOriginal: string) => {
+    if (!detailedRelato) return
+    try {
+      const blob = await relatosPublicApi.downloadAnexo((detailedRelato as any).protocolo, anexoId)
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = nomeOriginal
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      window.URL.revokeObjectURL(url)
+    } catch (error) {
+      alert('Erro ao baixar anexo')
+    }
+  }
+
+  const handleDownloadTodosAnexos = async () => {
+    for (const anexo of anexos) {
+      await handleDownloadAnexo(anexo.id, anexo.nome_original)
+      await new Promise(resolve => setTimeout(resolve, 500))
+    }
+  }
+
+  const handleSelectRelato = (relatoId: string) => {
+    setSelectedRelato(relatoId)
+    loadRelatoDetalhes(relatoId)
+  }
+
+  const detailedRelato = relatoDetalhado
 
   return (
     <div className="min-h-screen bg-background">
@@ -350,22 +186,22 @@ export default function RelatosPage() {
             <div className="bg-primary rounded-t-3xl p-6">
               <div className="flex gap-4 mb-6">
                 <Button
-                  onClick={() => setStatusFilter("nova")}
-                  className={`flex-1 h-14 text-base font-semibold ${statusFilter === "nova" ? "bg-white text-black hover:bg-white/90" : "bg-white/20 text-white hover:bg-white/30"}`}
+                  onClick={() => setStatusFilter("NOVO")}
+                  className={`flex-1 h-14 text-base font-semibold ${statusFilter === "NOVO" ? "bg-white text-black hover:bg-white/90" : "bg-white/20 text-white hover:bg-white/30"}`}
                 >
                   <Mail className="mr-2 h-5 w-5" />
-                  NOVA
+                  NOVO
                 </Button>
                 <Button
-                  onClick={() => setStatusFilter("andamento")}
-                  className={`flex-1 h-14 text-base font-semibold ${statusFilter === "andamento" ? "bg-white text-black hover:bg-white/90" : "bg-white/20 text-white hover:bg-white/30"}`}
+                  onClick={() => setStatusFilter("EM_ANDAMENTO")}
+                  className={`flex-1 h-14 text-base font-semibold ${statusFilter === "EM_ANDAMENTO" ? "bg-white text-black hover:bg-white/90" : "bg-white/20 text-white hover:bg-white/30"}`}
                 >
                   <Clock className="mr-2 h-5 w-5" />
-                  ANDAMENTO
+                  EM ANDAMENTO
                 </Button>
                 <Button
-                  onClick={() => setStatusFilter("finalizado")}
-                  className={`flex-1 h-14 text-base font-semibold ${statusFilter === "finalizado" ? "bg-white text-black hover:bg-white/90" : "bg-white/20 text-white hover:bg-white/30"}`}
+                  onClick={() => setStatusFilter("FINALIZADO")}
+                  className={`flex-1 h-14 text-base font-semibold ${statusFilter === "FINALIZADO" ? "bg-white text-black hover:bg-white/90" : "bg-white/20 text-white hover:bg-white/30"}`}
                 >
                   <Check className="mr-2 h-5 w-5" />
                   FINALIZADO
@@ -387,12 +223,10 @@ export default function RelatosPage() {
                         <SelectItem value="Todos">Todos os tipos</SelectItem>
                         <SelectItem value="ASSÉDIO MORAL">Assédio Moral</SelectItem>
                         <SelectItem value="ASSÉDIO SEXUAL">Assédio Sexual</SelectItem>
-                        <SelectItem value="AMEAÇA / AGRESSÃO">Ameaça / Agressão</SelectItem>
                         <SelectItem value="CONFLITO DE INTERESSES">Conflito de Interesses</SelectItem>
                         <SelectItem value="DISCRIMINAÇÃO">Discriminação</SelectItem>
-                        <SelectItem value="FRAUDE">Fraude</SelectItem>
-                        <SelectItem value="SAUDE E SEGURANÇA">Saúde e Segurança</SelectItem>
-                        <SelectItem value="VAZAMENTO DE DADOS">Vazamento de Dados</SelectItem>
+                        <SelectItem value="FRAUDE">Fraude / Corrupção</SelectItem>
+                        <SelectItem value="COMPORTAMENTO INADEQUADO">Comportamento Inadequado</SelectItem>
                         <SelectItem value="OUTROS (Uso Indevido)">Outros</SelectItem>
                       </SelectContent>
                     </Select>
@@ -401,38 +235,62 @@ export default function RelatosPage() {
                     <span className="text-sm text-muted-foreground mb-1">Comitês</span>
                     <Select value={comiteFilter} onValueChange={setComiteFilter}>
                       <SelectTrigger className="w-48">
-                        <SelectValue />
+                        <SelectValue placeholder="Todos os comitês" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Comitê 1">Comitê 1</SelectItem>
-                        <SelectItem value="Comitê 2">Comitê 2</SelectItem>
-                        <SelectItem value="Comitê 3">Comitê 3</SelectItem>
-                        <SelectItem value="Comitê 4">Comitê 4</SelectItem>
-                        <SelectItem value="Comitê 5">Comitê 5</SelectItem>
+                        <SelectItem value="todos">Todos os comitês</SelectItem>
+                        {comites.map((comite) => (
+                          <SelectItem key={comite.id} value={comite.id.toString()}>
+                            {comite.nome}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>
                 </div>
               </div>
 
+              {error && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+                  <p className="text-red-600 text-sm">{error}</p>
+                </div>
+              )}
+              
+              {loading ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  <p className="ml-3 text-muted-foreground">Carregando relatos...</p>
+                </div>
+              ) : relatos.length === 0 ? (
+                <div className="text-center py-12 text-muted-foreground">
+                  <p>Nenhum relato encontrado com os filtros selecionados.</p>
+                  <p className="text-xs mt-2">Status atual: {statusFilter}</p>
+                </div>
+              ) : (
               <div className="space-y-4">
-                {filteredRelatos.map((relato) => (
+                  {relatos.map((relato) => (
                   <div
                     key={relato.id}
-                    onClick={() => setSelectedRelato(relato.id)}
+                      onClick={() => handleSelectRelato(relato.id.toString())}
                     className="border-2 border-gray-300 rounded-2xl p-6 hover:border-primary cursor-pointer transition-colors"
                   >
                     <div className="flex justify-between items-start mb-4">
-                      <h3 className="text-xl font-bold">{relato.categoria}</h3>
+                        <div>
+                          <h3 className="text-xl font-bold">{relato.tipo}</h3>
+                          <p className="text-sm text-muted-foreground">
+                            Protocolo: {relato.protocolo} | Prioridade: {relato.prioridade}
+                          </p>
+                        </div>
                       <div className="text-right">
-                        <div className="text-sm font-semibold mb-4">Enviado</div>
-                        <div className="text-sm font-semibold mb-2" >{relato.data}</div>
+                          <div className="text-sm font-semibold mb-1">Enviado</div>
+                          <div className="text-sm">{new Date(relato.criado_em).toLocaleDateString('pt-BR')}</div>
+                        </div>
                       </div>
-                    </div>
-                    <p className="text-sm leading-relaxed">{relato.descricao}</p>
+                      <p className="text-sm leading-relaxed line-clamp-2">{relato.descricao}</p>
                   </div>
                 ))}
               </div>
+              )}
             </div>
           </div>
         ) : (
@@ -445,108 +303,239 @@ export default function RelatosPage() {
                 <ChevronLeft className="h-5 w-5" />
                 <span className="font-medium">Voltar</span>
               </button>
-              <button
-                onClick={() => navigate("/admin")}
-                className="flex items-center gap-2 text-foreground hover:text-primary transition-colors"
-              >
-                <Home className="h-5 w-5" />
-                <span className="font-medium">Ir para Home</span>
-              </button>
+              
             </div>
 
             <h1 className="text-4xl font-bold mb-8">Relatos</h1>
 
+            {loadingDetalhes ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <p className="ml-3 text-muted-foreground">Carregando detalhes...</p>
+              </div>
+            ) : detailedRelato ? (
             <div className="border-4 border-primary rounded-3xl p-8">
               <div className="flex justify-between items-start mb-8">
-                <h2 className="text-2xl font-bold">{detailedRelato?.categoria}</h2>
+                <div>
+                  <h2 className="text-2xl font-bold">{detailedRelato?.tipo}</h2>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Protocolo: {detailedRelato?.protocolo} | Status: {detailedRelato?.status} | Prioridade: {detailedRelato?.prioridade}
+                  </p>
+                </div>
                 <div className="text-right">
                   <div className="text-sm font-semibold">Enviado</div>
-                  <div className="text-sm">{detailedRelato?.data}</div>
+                  <div className="text-sm">{detailedRelato?.criado_em && new Date(detailedRelato.criado_em).toLocaleDateString('pt-BR')}</div>
                 </div>
               </div>
 
               <div className="grid md:grid-cols-2 gap-8">
                 <div>
-                  <h3 className="text-lg font-bold mb-4">Detalhes da Denuncia</h3>
+                  <h3 className="text-lg font-bold mb-4">Descrição</h3>
                   <p className="text-sm leading-relaxed">{detailedRelato?.descricao}</p>
                 </div>
 
                 <div className="bg-primary/10 p-4 rounded-lg">
-                  <h3 className="text-sm font-semibold mb-2">Detalhes da Denuncia</h3>
-                  <p className="text-xs leading-relaxed">
-                    {detailedRelato?.envolvidos ? (<>
-                      <span className="font-semibold">Envolvidos:</span> {detailedRelato.envolvidos}
-                    </>) : null}
-                    {detailedRelato?.relacao ? (<>
-                      <br />
-                      <span className="font-semibold">Relação:</span> {detailedRelato.relacao}
-                    </>) : null}
-                    {detailedRelato?.quemsabe ? (<>
-                      <br />
-                      <span className="font-semibold">Quem sabe:</span> {detailedRelato.quemsabe}
-                    </>) : null}
-                    {detailedRelato?.email ? (<>
-                      <br />
-                      <span className="font-semibold">Email:</span> {detailedRelato.email}
-                    </>) : null}
-                    
-                  </p>
+                  <h3 className="text-sm font-semibold mb-2">Informações Adicionais</h3>
+                  <div className="text-xs leading-relaxed space-y-1">
+                    {(detailedRelato as any)?.pessoas_envolvidas && (
+                      <p>
+                        <span className="font-semibold">Pessoas Envolvidas:</span> {(detailedRelato as any).pessoas_envolvidas}
+                      </p>
+                    )}
+                    {(detailedRelato as any)?.quem_sabe && (
+                      <p>
+                        <span className="font-semibold">Quem Sabe:</span> {(detailedRelato as any).quem_sabe}
+                      </p>
+                    )}
+                    {(detailedRelato as any)?.possui_evidencias && (
+                      <p>
+                        <span className="font-semibold text-blue-600">Possui Evidências</span>
+                      </p>
+                    )}
+                    {(detailedRelato as any)?.identificado && (
+                      <>
+                        {(detailedRelato as any)?.denunciante_nome && (
+                          <p>
+                            <span className="font-semibold">Nome:</span> {(detailedRelato as any).denunciante_nome}
+                          </p>
+                        )}
+                        {(detailedRelato as any)?.denunciante_email && (
+                          <p>
+                            <span className="font-semibold">Email:</span> {(detailedRelato as any).denunciante_email}
+                          </p>
+                        )}
+                        {(detailedRelato as any)?.denunciante_telefone && (
+                          <p>
+                            <span className="font-semibold">Telefone:</span> {(detailedRelato as any).denunciante_telefone}
+                          </p>
+                        )}
+                      </>
+                    )}
+                    {!(detailedRelato as any)?.identificado && (
+                      <p className="font-semibold text-yellow-600">Relato Anônimo</p>
+                    )}
+                    {(detailedRelato as any)?.email_notificacao && (
+                      <p>
+                        <span className="font-semibold">Email para notificação:</span> {(detailedRelato as any).email_notificacao}
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
 
+              {/* ANEXOS E EVIDÊNCIAS */}
+              {(detailedRelato as any)?.possui_evidencias && (
               <div className="mt-8">
-                <h3 className="text-lg font-bold mb-4">Evidencias</h3>
-                <p className="text-sm leading-relaxed">{detailedRelato?.evidencias}</p>
-              </div>
-
-              {/* Resposta Final - apenas para finalizados */}
-              {detailedRelato?.status === "finalizado" && finalResponses[selectedRelato] && (
-                <div className="mt-8">
                   <div className="flex items-center gap-2 mb-4">
-                    <FileText className="h-5 w-5" />
-                    <h3 className="text-lg font-bold">Resposta Final</h3>
+                    <Paperclip className="h-5 w-5" />
+                    <h3 className="text-lg font-bold">Anexos e Evidências</h3>
                   </div>
-                  <div className="bg-green-50 border-l-4 border-green-500 rounded-lg p-4">
-                    <p className="text-sm leading-relaxed">{finalResponses[selectedRelato]}</p>
+                  <div className="bg-purple-50 border-l-4 border-purple-500 rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-4">
+                      {anexos.length > 1 && (
+                        <Button
+                          onClick={handleDownloadTodosAnexos}
+                          size="sm"
+                          className=" text-white"
+                        >
+                          <Download className="mr-2 h-4 w-4" />
+                          Baixar Todos
+                        </Button>
+                      )}
+                    </div>
+                    
+                    {loadingAnexos ? (
+                      <div className="flex items-center gap-2 ">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        <span className="text-sm">Carregando anexos...</span>
+                      </div>
+                    ) : anexos.length > 0 ? (
+                      <div className="space-y-2">
+                        {anexos.map((anexo) => (
+                          <div key={anexo.id} className="flex items-center justify-between bg-white p-3 rounded border ">
+                            <div className="flex-1">
+                              <p className="text-sm font-medium text-gray-900">{anexo.nome_original}</p>
+                              <p className="text-xs text-gray-500">
+                                {(anexo.tamanho / 1024).toFixed(2)} KB | {new Date(anexo.criado_em).toLocaleDateString('pt-BR')}
+                              </p>
+                            </div>
+                            <Button
+                              onClick={() => handleDownloadAnexo(anexo.id, anexo.nome_original)}
+                              size="sm"
+                              variant="outline"
+                              className="ml-4"
+                            >
+                              <Download className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-purple-600">
+                        O denunciante informou que possui evidências mas ainda não enviou arquivos.
+                      </p>
+                    )}
                   </div>
                 </div>
               )}
 
-              {/* Comentários - para andamento e finalizados */}
-              {(detailedRelato?.status === "andamento" || detailedRelato?.status === "finalizado") && (
+              {/* DIVISÓRIA: TRATATIVAS */}
+              <div className="my-12">
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                  </div>
+                  
+                </div>
+              </div>
+
+              {/* RESPOSTA FINAL */}
+              {(detailedRelato as any)?.resposta_final && (
+                <div className="mt-8">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Mail className="h-5 w-5" />
+                    <h3 className="text-lg font-bold">Resposta Final Enviada ao Denunciante</h3>
+                  </div>
+                  <div className="bg-green-50 border-l-4 border-green-500 rounded-lg p-4">
+                  <div className="flex items-center gap-2">
+                    <MessageSquare className="h-4 w-4 text-blue-600" />
+                    <span className="text-sm font-semibold text-blue-700">Resposta Final
+                      </span>
+                  </div>
+                    {(detailedRelato as any)?.respondido_em && (
+                      <p className="text-xs text-muted-foreground ">
+                        Respondido em: {new Date((detailedRelato as any).respondido_em).toLocaleString('pt-BR')}
+                      </p>
+                    )}
+                    <p className="text-sm leading-relaxed text-gray-700 bg-white p-4 rounded">
+                      {(detailedRelato as any).resposta_final}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+
+              {/* MENSAGENS DO DENUNCIANTE */}
+              {detailedRelato?.mensagens && detailedRelato.mensagens.length > 0 && (
+                <div className="mt-8">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Mail className="h-5 w-5" />
+                    <h3 className="text-lg font-bold">Mensagens do Denunciante</h3>
+                  </div>
+                  <div className="space-y-4">
+                    {detailedRelato.mensagens.map((msg: any) => (
+                      <div
+                        key={msg.id}
+                        className="bg-blue-50 border-l-4 border-blue-500 rounded-lg p-4"
+                      >
+                        <div className="flex justify-between items-start mb-2">
+                          <div className="flex items-center gap-2">
+                            <MessageSquare className="h-4 w-4 text-blue-600" />
+                            <span className="text-sm font-semibold text-blue-700">
+                              Denunciante
+                            </span>
+                          </div>
+                          <span className="text-xs text-muted-foreground">
+                            {new Date(msg.criado_em).toLocaleString('pt-BR')}
+                          </span>
+                        </div>
+                        <p className="text-sm leading-relaxed text-gray-700">{msg.texto || msg.conteudo}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* COMENTÁRIOS INTERNOS */}
+              {detailedRelato?.comentarios && detailedRelato.comentarios.length > 0 && (
                 <div className="mt-8">
                   <div className="flex items-center gap-2 mb-4">
                     <MessageSquare className="h-5 w-5" />
-                    <h3 className="text-lg font-bold">Comentários sobre o Tratamento</h3>
+                    <h3 className="text-lg font-bold">Comentários Internos</h3>
                   </div>
                   <div className="space-y-4">
-                    {comments[selectedRelato] && comments[selectedRelato].length > 0 ? (
-                      comments[selectedRelato].map((comment) => (
+                    {detailedRelato.comentarios.map((comment: any) => (
                         <div
                           key={comment.id}
                           className="bg-primary/10 border-l-4 border-primary rounded-lg p-4"
                         >
                           <div className="flex justify-between items-start mb-2">
-                            <span className="text-sm font-semibold text-primary">{comment.autor}</span>
-                            <span className="text-xs text-muted-foreground">{comment.data}</span>
-                          </div>
-                          <p className="text-sm leading-relaxed">{comment.texto}</p>
+                          <span className="text-sm font-semibold text-primary">
+                            {comment.usuario || 'Operador'}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            {new Date(comment.criado_em).toLocaleString('pt-BR')}
+                          </span>
                         </div>
-                      ))
-                    ) : (
-                      <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 text-center">
-                        <p className="text-sm text-muted-foreground">
-                          Nenhum comentário adicionado ainda.
-                        </p>
+                        <p className="text-sm leading-relaxed">{comment.conteudo || comment.texto}</p>
                       </div>
-                    )}
+                    ))}
                   </div>
                 </div>
               )}
 
               {/* Botões - diferentes para cada status */}
               <div className="flex justify-end gap-4 mt-8">
-                {detailedRelato?.status === "finalizado" ? (
+                {detailedRelato?.status === "FINALIZADO" || detailedRelato?.status === "ARQUIVADO" ? (
                   <Button
                     onClick={() => setShowReopenDialog(true)}
                     className="bg-primary hover:bg-primary/90 text-white px-8"
@@ -578,6 +567,11 @@ export default function RelatosPage() {
                 )}
               </div>
             </div>
+            ) : (
+              <div className="text-center py-12 text-muted-foreground">
+                Erro ao carregar detalhes do relato.
+              </div>
+            )}
           </div>
         )}
       </main>
@@ -585,28 +579,80 @@ export default function RelatosPage() {
       <Dialog open={showTransferDialog} onOpenChange={setShowTransferDialog}>
         <DialogContent className="max-w-2xl rounded-3xl border-4 border-primary p-8">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold text-center mb-6">Transferir para Equipe</DialogTitle>
+            <DialogTitle className="text-2xl font-bold text-center mb-6">Transferir para Comitê</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label className="text-base font-semibold text-center mb-6 flex">Comite</Label>
-              <Select defaultValue="comite1">
-                <SelectTrigger className="mt-2">
-                  <SelectValue />
+              <Label className="text-base font-semibold mb-2 block">Selecione o Comitê</Label>
+              <Select value={targetComite} onValueChange={setTargetComite}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Escolha um comitê" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="comite1">Comitê 1</SelectItem>
-                  <SelectItem value="comite2">Comitê 2</SelectItem>
-                  <SelectItem value="comite3">Comitê 3</SelectItem>
-                  <SelectItem value="comite4">Comitê 4</SelectItem>
+                  {comites.map((comite) => (
+                    <SelectItem key={comite.id} value={comite.id.toString()}>
+                      {comite.nome}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
              <div className="flex justify-end gap-4 mt-8">
                 <Button
-                  onClick={() => setShowTransferDialog(false)}
+                onClick={() => {
+                  setShowTransferDialog(false)
+                  setTargetComite("")
+                }}
+                variant="outline"
+              >
+                Cancelar
+              </Button>
+              <Button
+                onClick={async () => {
+                  if (!selectedRelato || !targetComite) {
+                    alert('Selecione um comitê')
+                    return
+                  }
+                  setActionLoading(true)
+                  const statusAntes = detailedRelato?.status
+                  try {
+                    // Se o relato está NOVO, primeiro inicia o tratamento
+                    if (statusAntes === 'NOVO') {
+                      await relatosAuthApi.iniciarRelato(selectedRelato)
+                    }
+                    
+                    // Motivo automático
+                    const comiteSelecionado = comites.find(c => c.id.toString() === targetComite)
+                    const motivo = `Transferido para ${comiteSelecionado?.nome || 'outro comitê'}`
+                    
+                    await relatosAuthApi.transferirRelato(
+                      selectedRelato,
+                      targetComite,
+                      motivo
+                    )
+                    alert('Relato transferido com sucesso!')
+                    setShowTransferDialog(false)
+                    setTargetComite("")
+                    
+                    // Só muda de aba se era NOVO
+                    if (statusAntes === 'NOVO') {
+                      setStatusFilter("EM_ANDAMENTO")
+                      setSelectedRelato(null)
+                    } else {
+                      await loadRelatoDetalhes(selectedRelato)
+                    }
+                    
+                    await loadRelatos()
+                  } catch (error: any) {
+                    alert(error.response?.data?.message || 'Erro ao transferir relato')
+                  } finally {
+                    setActionLoading(false)
+                  }
+                }}
+                disabled={actionLoading || !targetComite}
                   className="bg-primary hover:bg-primary/90 text-white px-8"
                 >
+                {actionLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                   Transferir
                 </Button>
               </div>
@@ -624,30 +670,124 @@ export default function RelatosPage() {
               <AlertTriangle className="h-5 w-5 text-yellow-600 mt-0.5" />
               <div>
                 <p className="font-semibold">Esta é a resposta final do caso.</p>
-                <p>Ao enviar, o relato será encerrado para a parte denunciante. Revise com atenção — depois de enviada, a mensagem não poderá ser alterada.</p>
+                <p>Ao enviar, o relato será encerrado. Revise com atenção.</p>
               </div>
             </div>
             <div>
               <Label className="text-base font-semibold">Mensagem</Label>
-              <Textarea className="mt-2 min-h-32" placeholder="Digite sua resposta..." />
+              <Textarea 
+                className="mt-2 min-h-32" 
+                placeholder="Digite sua resposta ao denunciante (mínimo 10 caracteres)..." 
+                value={responseText}
+                onChange={(e) => setResponseText(e.target.value)}
+              />
+              {responseText.trim().length > 0 && responseText.trim().length < 10 && (
+                <p className="text-xs text-red-600 mt-1">
+                  Mínimo 10 caracteres. Faltam {10 - responseText.trim().length}.
+                </p>
+              )}
             </div>
             <div>
-              <Label className="text-base font-semibold">Anexar Arquivo (opcional)</Label>
+              <Label className="text-base font-semibold">Anexar Arquivos (opcional)</Label>
               <div className="mt-2">
                 <input
                   type="file"
                   multiple
+                  onChange={(e) => {
+                    if (e.target.files) {
+                      setResponseFiles(Array.from(e.target.files))
+                    }
+                  }}
                   className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary/90 cursor-pointer"
-                  accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.xls,.xlsx"
+                  accept=".pdf,.jpg,.jpeg,.png"
                 />
                 <p className="mt-1 text-xs text-muted-foreground">
-                  Formatos aceitos: PDF, DOC, DOCX, JPG, PNG, XLS, XLSX (máx. 10MB por arquivo)
+                  Formatos aceitos: PDF, JPG, PNG (máx. 10MB por arquivo)
                 </p>
+                {responseFiles.length > 0 && (
+                  <div className="mt-2 space-y-1">
+                    {responseFiles.map((file, index) => (
+                      <div key={index} className="flex items-center justify-between bg-gray-100 p-2 rounded text-sm">
+                        <span>{file.name} ({(file.size / 1024).toFixed(2)} KB)</span>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => setResponseFiles(responseFiles.filter((_, i) => i !== index))}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
-            <Button className="w-full bg-primary hover:bg-primary/90 text-white"
-            onClick={() => setShowResponseDialog(false)}
-            >Enviar Resposta e Finalizar</Button>
+            <div className="flex justify-end gap-4">
+              <Button
+                onClick={() => {
+                  setShowResponseDialog(false)
+                  setResponseText("")
+                }}
+                variant="outline"
+              >
+                Cancelar
+              </Button>
+              <Button 
+                className="bg-primary hover:bg-primary/90 text-white px-8"
+                onClick={async () => {
+                  if (!selectedRelato || !responseText.trim()) {
+                    alert('Digite uma mensagem')
+                    return
+                  }
+                  
+                  if (responseText.length < 10) {
+                    alert('A resposta deve ter no mínimo 10 caracteres')
+                    return
+                  }
+                  
+                  setActionLoading(true)
+                  try {
+                    const protocolo = (detailedRelato as any)?.protocolo
+                    
+                    // 1. Se tem arquivos, faz upload primeiro
+                    if (responseFiles.length > 0 && protocolo) {
+                      console.log('Fazendo upload de', responseFiles.length, 'arquivo(s)...')
+                      try {
+                        await relatosPublicApi.uploadAnexos(protocolo, responseFiles)
+                        console.log('Arquivos enviados com sucesso!')
+                      } catch (uploadError: any) {
+                        console.error('Erro ao enviar arquivos:', uploadError)
+                        alert('Aviso: Houve um erro ao enviar os arquivos anexados, mas a resposta será enviada.')
+                      }
+                    }
+                    
+                    // 2. Envia a resposta (já finaliza automaticamente)
+                    console.log('Respondendo e finalizando relato:', selectedRelato, responseText)
+                    await relatosAuthApi.responderRelato(selectedRelato, responseText)
+                    console.log('Relato respondido e finalizado!')
+                    
+                    alert('Relato respondido e finalizado com sucesso!')
+                    setShowResponseDialog(false)
+                    setResponseText("")
+                    setResponseFiles([])
+                    setStatusFilter("FINALIZADO")
+                    setSelectedRelato(null)
+                    await loadRelatos()
+                  } catch (error: any) {
+                    console.error('ERRO ao finalizar:', error)
+                    console.error('Response:', error.response?.data)
+                    alert(error.response?.data?.message || error.response?.data?.error?.message || 'Erro ao finalizar relato')
+                  } finally {
+                    setActionLoading(false)
+                  }
+                }}
+                disabled={actionLoading || !responseText.trim()}
+              >
+                {actionLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                Enviar e Finalizar
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
@@ -662,12 +802,22 @@ export default function RelatosPage() {
               <Label className="text-base font-semibold">Motivo da Reabertura</Label>
               <Textarea 
                 className="mt-2 min-h-32" 
-                placeholder="Descreva o motivo para reabrir este caso..." 
+                placeholder="Descreva o motivo para reabrir este caso (mínimo 10 caracteres)..."
+                value={reopenMotivo}
+                onChange={(e) => setReopenMotivo(e.target.value)}
               />
+              {reopenMotivo.trim().length > 0 && reopenMotivo.trim().length < 10 && (
+                <p className="text-xs text-red-600 mt-1">
+                  Mínimo 10 caracteres. Faltam {10 - reopenMotivo.trim().length}.
+                </p>
+              )}
             </div>
             <div className="flex justify-end gap-4">
               <Button
-                onClick={() => setShowReopenDialog(false)}
+                onClick={() => {
+                  setShowReopenDialog(false)
+                  setReopenMotivo("")
+                }}
                 variant="outline"
                 className="px-8"
               >
@@ -675,15 +825,36 @@ export default function RelatosPage() {
               </Button>
               <Button 
                 className="bg-primary hover:bg-primary/90 text-white px-8"
-                onClick={() => {
-                  // Aqui você pode adicionar a lógica para reabrir o caso
-                  // Por exemplo, atualizar o status do relato de "finalizado" para "andamento"
-                  console.log("Caso reaberto:", selectedRelato)
+                onClick={async () => {
+                  if (!selectedRelato || !reopenMotivo.trim()) {
+                    alert('Digite o motivo da reabertura')
+                    return
+                  }
+                  
+                  if (reopenMotivo.trim().length < 10) {
+                    alert('O motivo deve ter no mínimo 10 caracteres')
+                    return
+                  }
+                  
+                  setActionLoading(true)
+                  try {
+                    await relatosAuthApi.reabrirRelato(selectedRelato, reopenMotivo)
+                    alert('Caso reaberto com sucesso!')
                   setShowReopenDialog(false)
-                  // Você pode adicionar uma notificação de sucesso aqui
+                    setReopenMotivo("")
+                    setStatusFilter("EM_ANDAMENTO")
+                    setSelectedRelato(null)
+                    await loadRelatos()
+                  } catch (error: any) {
+                    console.error('Erro ao reabrir:', error)
+                    alert(error.response?.data?.message || error.response?.data?.error?.message || 'Erro ao reabrir caso')
+                  } finally {
+                    setActionLoading(false)
+                  }
                 }}
+                disabled={actionLoading || !reopenMotivo.trim() || reopenMotivo.trim().length < 10}
               >
-                <RotateCcw className="mr-2 h-4 w-4" />
+                {actionLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                 Reabrir Caso
               </Button>
             </div>
@@ -733,26 +904,45 @@ export default function RelatosPage() {
               </Button>
               <Button 
                 className="bg-primary hover:bg-primary/90 text-white px-8"
-                onClick={() => {
-                  if (commentText.trim() && selectedRelato) {
-                    const newComment: Comment = {
-                      id: Date.now(),
-                      texto: commentText.trim(),
-                      data: new Date().toLocaleDateString("pt-BR"),
-                      autor: "Admin" // Você pode pegar do contexto de autenticação
+                onClick={async () => {
+                  if (!commentText.trim() || !selectedRelato) {
+                    alert('Digite um comentário')
+                    return
+                  }
+                  setActionLoading(true)
+                  const statusAntes = detailedRelato?.status
+                  try {
+                    // Se o relato está NOVO, primeiro inicia o tratamento
+                    if (statusAntes === 'NOVO') {
+                      await relatosAuthApi.iniciarRelato(selectedRelato)
                     }
                     
-                    setComments((prev) => ({
-                      ...prev,
-                      [selectedRelato]: [...(prev[selectedRelato] || []), newComment]
-                    }))
-                    
+                    // Depois adiciona o comentário
+                    await relatosAuthApi.addComentario(selectedRelato, commentText)
+                    alert('Comentário adicionado com sucesso!')
                     setShowCommentDialog(false)
                     setCommentText("")
+                    
+                    // Só muda de aba se o status era NOVO (agora virou EM_ANDAMENTO)
+                    if (statusAntes === 'NOVO') {
+                      setStatusFilter("EM_ANDAMENTO")
+                      setSelectedRelato(null)
+                    } else {
+                      // Se já estava em andamento, apenas recarrega os detalhes
+                      await loadRelatoDetalhes(selectedRelato)
+                    }
+                    
+                    await loadRelatos()
+                  } catch (error: any) {
+                    alert(error.response?.data?.message || error.response?.data?.error?.message || 'Erro ao adicionar comentário')
+                    console.error('Erro detalhado:', error.response?.data)
+                  } finally {
+                    setActionLoading(false)
                   }
                 }}
-                disabled={!commentText.trim()}
+                disabled={!commentText.trim() || actionLoading}
               >
+                {actionLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                 Salvar Comentário
               </Button>
             </div>

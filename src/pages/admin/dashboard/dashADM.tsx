@@ -2,7 +2,7 @@ import { useMemo, useState } from "react"
 import { HeaderAdmin } from "@/components/headerAdmin"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Download, Calendar as CalendarIcon, BarChart3, TrendingUp, TrendingDown, Loader2, X, ChevronLeft, Filter } from "lucide-react"
+import { Download, Calendar as CalendarIcon, BarChart3, TrendingUp, TrendingDown, Loader2, X, ChevronLeft, Filter, FileSpreadsheet, FileJson, FileText, ChevronDown } from "lucide-react"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 import { useDashboard } from "@/hooks/useDashboard"
 import type { DashboardPeriod } from "@/types/dashboard"
@@ -37,10 +37,22 @@ export default function DashboardPage() {
     ]
   )
 
-  const { data, loading, error, exportReport } = useDashboard(filters)
+  const { data, loading, error, exportAsCSV, exportAsExcel, exportAsJSON } = useDashboard(filters)
+  const [showExportMenu, setShowExportMenu] = useState(false)
 
-  const handleExport = async () => {
-    await exportReport()
+  const handleExportCSV = async () => {
+    await exportAsCSV()
+    setShowExportMenu(false)
+  }
+
+  const handleExportExcel = async () => {
+    await exportAsExcel()
+    setShowExportMenu(false)
+  }
+
+  const handleExportJSON = async () => {
+    await exportAsJSON()
+    setShowExportMenu(false)
   }
 
   const formatVariacao = (percentual: number) => {
@@ -143,25 +155,52 @@ export default function DashboardPage() {
             <div className="flex justify-between items-center mb-8">
               <h1 className="text-3xl font-bold text-white">Dashboard</h1>
               <div className="flex gap-4 relative z-10">
-                <Button
-                  onClick={handleExport}
-                  disabled={loading}
-                  className="bg-white hover:bg-white/90 text-primary gap-2 flex-col h-auto py-2"
-                >
-                  <div className="flex items-center gap-2">
-                    {loading ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <Download className="h-4 w-4" />
-                    )}
-                    <span>Baixar Relatório</span>
-                  </div>
-                  <span className="text-xs text-muted-foreground">
-                    {data?.periodo.inicio && data?.periodo.fim
-                      ? `${data.periodo.inicio} - ${data.periodo.fim}`
-                      : "Período"}
-                  </span>
-                </Button>
+                <div className="relative">
+                  <Button
+                    onClick={() => setShowExportMenu(!showExportMenu)}
+                    disabled={loading}
+                    className="bg-white hover:bg-white/90 text-primary gap-2 flex items-center h-auto py-3 px-4"
+                  >
+                    <Download className="h-4 w-4" />
+                    <span>Exportar</span>
+                    <ChevronDown className="h-4 w-4 ml-1" />
+                  </Button>
+                  
+                  {showExportMenu && !loading && (
+                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                      <button
+                        onClick={handleExportExcel}
+                        className="w-full px-4 py-3 text-left hover:bg-gray-100 flex items-center gap-3 transition-colors"
+                      >
+                        <FileSpreadsheet className="h-4 w-4 text-green-600" />
+                        <div>
+                          <div className="font-medium text-sm">Excel (.xlsx)</div>
+                          <div className="text-xs text-muted-foreground">Recomendado para análise</div>
+                        </div>
+                      </button>
+                      <button
+                        onClick={handleExportCSV}
+                        className="w-full px-4 py-3 text-left hover:bg-gray-100 flex items-center gap-3 transition-colors"
+                      >
+                        <FileText className="h-4 w-4 text-blue-600" />
+                        <div>
+                          <div className="font-medium text-sm">CSV (.csv)</div>
+                          <div className="text-xs text-muted-foreground">Compatível com Excel</div>
+                        </div>
+                      </button>
+                      <button
+                        onClick={handleExportJSON}
+                        className="w-full px-4 py-3 text-left hover:bg-gray-100 flex items-center gap-3 transition-colors"
+                      >
+                        <FileJson className="h-4 w-4 text-purple-600" />
+                        <div>
+                          <div className="font-medium text-sm">JSON (.json)</div>
+                          <div className="text-xs text-muted-foreground">Para desenvolvedores</div>
+                        </div>
+                      </button>
+                    </div>
+                  )}
+                </div>
                 <Popover open={isPopoverOpen} onOpenChange={handleOpenChange}>
                   <PopoverTrigger asChild>
                     <Button 
@@ -178,7 +217,7 @@ export default function DashboardPage() {
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent 
-                    className="w-auto p-0 !z-[9999] bg-white shadow-xl border-2" 
+                    className="w-auto p-5 !z-[9999] bg-white shadow-2xl border-2 border-primary/20 rounded-2xl max-w-3xl max-h-[90vh] overflow-y-auto" 
                     align="end"
                     sideOffset={8}
                     side="bottom"
@@ -195,18 +234,25 @@ export default function DashboardPage() {
                       }
                     }}
                   >
-                    <div className="p-4">
+                    <div className="bg-white">
+                      {/* Título */}
+                      <div className="mb-5 pb-3 border-b-2 border-gray-200">
+                        <h3 className="text-lg font-bold text-gray-900 mb-1">Selecione o Período</h3>
+                        <p className="text-xs text-gray-600">Escolha um atalho rápido ou selecione as datas no calendário abaixo</p>
+                      </div>
+
                       {/* Atalhos rápidos */}
-                      <div className="mb-4 space-y-2">
-                        <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+                      <div className="mb-5">
+                        <div className="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
+                          <div className="w-1 h-4 bg-primary rounded-full"></div>
                           Atalhos Rápidos
                         </div>
-                        <div className="grid grid-cols-2 gap-2">
+                        <div className="grid grid-cols-3 gap-2">
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => handleQuickSelect(0)}
-                            className="text-xs h-8"
+                            onClick={() => { handleQuickSelect(0); handleApplyFilter(); }}
+                            className="text-xs h-10 border-2 border-primary/30 hover:border-primary hover:bg-primary hover:text-white transition-all font-medium"
                             type="button"
                           >
                             Hoje
@@ -214,8 +260,8 @@ export default function DashboardPage() {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => handleQuickSelect(6)}
-                            className="text-xs h-8"
+                            onClick={() => { handleQuickSelect(6); handleApplyFilter(); }}
+                            className="text-xs h-10 border-2 border-primary/30 hover:border-primary hover:bg-primary hover:text-white transition-all font-medium"
                             type="button"
                           >
                             Últimos 7 dias
@@ -223,8 +269,8 @@ export default function DashboardPage() {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => handleQuickSelect(29)}
-                            className="text-xs h-8"
+                            onClick={() => { handleQuickSelect(29); handleApplyFilter(); }}
+                            className="text-xs h-10 border-2 border-primary/30 hover:border-primary hover:bg-primary hover:text-white transition-all font-medium"
                             type="button"
                           >
                             Últimos 30 dias
@@ -232,26 +278,26 @@ export default function DashboardPage() {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={handleThisMonth}
-                            className="text-xs h-8"
+                            onClick={() => { handleThisMonth(); handleApplyFilter(); }}
+                            className="text-xs h-10 border-2 border-primary/30 hover:border-primary hover:bg-primary hover:text-white transition-all font-medium"
                             type="button"
                           >
-                            Este mês
+                            Este Mês
                           </Button>
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={handleLastMonth}
-                            className="text-xs h-8"
+                            onClick={() => { handleLastMonth(); handleApplyFilter(); }}
+                            className="text-xs h-10 border-2 border-primary/30 hover:border-primary hover:bg-primary hover:text-white transition-all font-medium"
                             type="button"
                           >
-                            Mês passado
+                            Mês Passado
                           </Button>
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => handleQuickSelect(89)}
-                            className="text-xs h-8"
+                            onClick={() => { handleQuickSelect(89); handleApplyFilter(); }}
+                            className="text-xs h-10 border-2 border-primary/30 hover:border-primary hover:bg-primary hover:text-white transition-all font-medium"
                             type="button"
                           >
                             Últimos 90 dias
@@ -259,39 +305,55 @@ export default function DashboardPage() {
                         </div>
                       </div>
 
+                      <div className="my-4 border-t-2 border-gray-200"></div>
+
                       {/* Calendário */}
-                      <div className="border rounded-lg p-2 bg-accent/30">
-                        <Calendar
-                          initialFocus
-                          mode="range"
-                          selected={tempDateRange}
-                          onSelect={setTempDateRange}
-                          numberOfMonths={2}
-                          className="rounded-md"
-                        />
+                      <div className="mb-5">
+                        <div className="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
+                          <div className="w-1 h-4 bg-primary rounded-full"></div>
+                          Ou selecione datas manualmente
+                        </div>
+                        <div className="border-2 border-primary/20 rounded-xl p-4 bg-gradient-to-br from-gray-50 to-white shadow-inner">
+                          <Calendar
+                            initialFocus
+                            mode="range"
+                            selected={tempDateRange}
+                            onSelect={setTempDateRange}
+                            numberOfMonths={2}
+                            className="rounded-lg"
+                            classNames={{
+                              months: "flex flex-col sm:flex-row gap-6",
+                              month: "space-y-3",
+                            }}
+                          />
+                        </div>
                       </div>
 
                       {/* Informação do período selecionado */}
                       {tempDateRange?.from && tempDateRange?.to && (
-                        <div className="mt-3 p-2 bg-primary/10 rounded-md border border-primary/20">
-                          <div className="text-xs font-medium text-primary mb-1">Período selecionado:</div>
-                          <div className="text-sm text-foreground">
+                        <div className="mb-5 p-3 bg-gradient-to-r from-primary/10 to-primary/5 rounded-xl border-2 border-primary/30 shadow-sm">
+                          <div className="text-xs font-bold text-primary mb-1 uppercase tracking-wide">Período Selecionado</div>
+                          <div className="text-sm font-semibold text-gray-900 flex items-center gap-2">
+                            <CalendarIcon className="h-3 w-3 text-primary" />
                             {formatDateLabel(tempDateRange.from)} até {formatDateLabel(tempDateRange.to)}
+                          </div>
+                          <div className="text-xs text-gray-600 mt-1">
+                            {Math.ceil((tempDateRange.to.getTime() - tempDateRange.from.getTime()) / (1000 * 60 * 60 * 24))} dias
                           </div>
                         </div>
                       )}
 
                       {/* Botões de ação */}
-                      <div className="flex items-center justify-between mt-4 pt-4 border-t gap-2">
+                      <div className="flex items-center justify-between pt-3 border-t-2 border-gray-200 gap-3 sticky bottom-0 bg-white pb-1">
                         <Button 
                           variant="ghost" 
                           size="sm" 
                           onClick={handleClearFilter}
                           type="button"
-                          className="gap-2"
+                          className="gap-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                         >
                           <X className="h-4 w-4" />
-                          Limpar
+                          Limpar Filtro
                         </Button>
                         <div className="flex gap-2">
                           <Button 
@@ -299,6 +361,7 @@ export default function DashboardPage() {
                             size="sm"
                             onClick={() => setIsPopoverOpen(false)}
                             type="button"
+                            className="border-2 border-gray-300 hover:border-gray-400 px-4"
                           >
                             Cancelar
                           </Button>
@@ -307,9 +370,9 @@ export default function DashboardPage() {
                             onClick={handleApplyFilter}
                             disabled={!tempDateRange?.from || !tempDateRange?.to}
                             type="button"
-                            className="bg-primary hover:bg-primary/90"
+                            className="bg-primary hover:bg-primary/90 text-white px-4 shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                           >
-                            Aplicar
+                            Aplicar Filtro
                           </Button>
                         </div>
                       </div>

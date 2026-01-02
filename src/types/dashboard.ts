@@ -44,5 +44,7 @@ export interface DashboardFilters {
   groupBy?: DashboardPeriod
   dataInicio?: string
   dataFim?: string
+  tipoOcorrencia?: string
+  comiteId?: string
 }
 

@@ -1,0 +1,136 @@
+###
+# Canal de Ouvidoria - API Requests
+# Use a extensão REST Client no VS Code para executar estas requisições
+###
+
+@baseUrl = http://localhost:3001
+@email = admin@ouvidoria.com
+
+### ============================================================================
+### HEALTH CHECK
+### ============================================================================
+
+### Health check geral
+GET {{baseUrl}}/health
+
+### Health check de autenticação
+GET {{baseUrl}}/api/auth/health
+
+### ============================================================================
+### AUTENTICAÇÃO
+### ============================================================================
+
+### 1. Solicitar Magic Link
+# @name requestMagicLink
+POST {{baseUrl}}/api/auth/magic-link
+Content-Type: application/json
+
+{
+  "email": "{{email}}"
+}
+
+###
+# IMPORTANTE: Após executar a requisição acima, verifique os logs do backend
+# para obter o token do magic link:
+#   docker-compose logs backend | grep "Magic link gerado"
+#
+# Copie o token e cole na variável abaixo:
+
+@magicLinkToken = SEU_TOKEN_AQUI
+
+### 2. Verificar Magic Link e fazer login
+# @name verifyMagicLink
+GET {{baseUrl}}/api/auth/verify-magic-link?token={{magicLinkToken}}
+
+###
+# Após executar a requisição acima, os tokens serão retornados.
+# Copie-os e cole nas variáveis abaixo:
+
+@accessToken = SEU_ACCESS_TOKEN_AQUI
+@refreshToken = SEU_REFRESH_TOKEN_AQUI
+
+### 3. Obter informações do usuário autenticado
+GET {{baseUrl}}/api/auth/me
+Authorization: Bearer {{accessToken}}
+
+### 4. Renovar tokens (quando accessToken expirar)
+# @name refreshTokens
+POST {{baseUrl}}/api/auth/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+### 5. Logout (revoga refresh token)
+POST {{baseUrl}}/api/auth/logout
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refreshToken}}",
+  "revokeAll": false
+}
+
+### 6. Logout de todas as sessões
+POST {{baseUrl}}/api/auth/logout
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "revokeAll": true
+}
+
+### ============================================================================
+### TESTES DE ERRO
+### ============================================================================
+
+### Tentar acessar rota protegida sem token
+GET {{baseUrl}}/api/auth/me
+
+### Tentar acessar com token inválido
+GET {{baseUrl}}/api/auth/me
+Authorization: Bearer token_invalido
+
+### Tentar solicitar magic link com email inválido
+POST {{baseUrl}}/api/auth/magic-link
+Content-Type: application/json
+
+{
+  "email": "email-invalido"
+}
+
+### Tentar verificar token inválido
+GET {{baseUrl}}/api/auth/verify-magic-link?token=token_invalido_64_caracteres_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+### ============================================================================
+### RATE LIMITING - Testar limites
+### ============================================================================
+
+### Testar rate limit de magic link (máx 3 por hora por email)
+# Execute esta requisição várias vezes rapidamente
+
+POST {{baseUrl}}/api/auth/magic-link
+Content-Type: application/json
+
+{
+  "email": "{{email}}"
+}
+
+### ============================================================================
+### NOTAS
+### ============================================================================
+
+# 1. Access Token expira em 15 minutos
+# 2. Refresh Token expira em 7 dias
+# 3. Magic Link expira em 15 minutos
+# 4. Rate limits:
+#    - Magic Link por email: 3/hora
+#    - Magic Link por IP: 10/hora
+#    - Geral por IP: 30/minuto
+#
+# 5. Em desenvolvimento, os magic links são logados no console.
+#    Em produção, eles devem ser enviados por email.
+
+
+

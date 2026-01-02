@@ -7,31 +7,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { useState } from "react"
 import { ChevronLeft, Mail, Clock, Check, MessageSquare, RotateCcw, FileText } from "lucide-react"
 
-// Reutiliza os dados mockados da página de admin
-import { default as AdminRelatos } from "../../admin/relatos/homeRelatos"
-
-// Mock de relatos (mesmo da página admin)
-const mockRelatos = [
-  {
-    id: 1, categoria: "ASSÉDIO MORAL", descricao: "O gerente da área de Vendas, Sr. Silva, humilha a equipe em reuniões, usando palavras de baixo calão e fazendo ameaças constantes de demissão se as metas não forem batidas.", evidencias: "Tenho uma gravação de áudio da última reunião (anexo).", envolvidos: "", relacao: "", quemsabe: "", email: "equipe.vendas.desgastada@email.com", data: "14/11/2025", status: "nova" },
-  { id: 2, categoria: "SAUDE E SEGURANÇA", descricao: "A máquina de prensa 03 está sem a grade de proteção obrigatória. A trava de segurança foi 'amarrada' para produzir mais rápido. Um operador quase perdeu a mão hoje.", evidencias: "Fotos da máquina e da 'gambiarra' na trava.", envolvidos: "Supervisor de Produção (Carlos)", relacao: "Operador de Máquina (Turno B)", quemsabe: "Toda a equipe do Turno B sabe, mas tem medo de falar.", email: "operador.seguro@email.com", data: "13/11/2025", status: "nova" },
-  { id: 3, categoria: "FRAUDE", descricao: "Estão inflando as notas de despesa de viagem. O valor do hotel da última viagem do diretor foi o dobro do que realmente custou. A secretária está lançando as notas 'corrigidas'.", evidencias: "Sem evidências, mas podem checar a Nota Fiscal 12345 da viagem para Recife.", envolvidos: "", relacao: "", quemsabe: "", email: "", data: "12/11/2025", status: "nova" },
-  { id: 4, categoria: "DISCRIMINAÇÃO", descricao: "Durante o processo seletivo para vaga de Analista Sr., ouvi o recrutador dizer que 'não contrataria aquela candidata porque ela acabou de casar e logo vai querer engravidar'.", evidencias: "Sem evidências, foi uma conversa de corredor.", envolvidos: "Recrutador (João) e Gerente (Mariana)", relacao: "Analista de RH", quemsabe: "Apenas eu ouvi.", email: "rh.consciente@email.com", data: "11/11/2025", status: "nova" },
-  { id: 5, categoria: "CONFLITO DE INTERESSES", descricao: "O processo de licitação para o novo software de RH está sendo direcionado para a empresa 'SoftTech'. Descobri que essa empresa pertence ao cunhado da gerente de RH.", evidencias: "E-mails internos direcionando a escolha antes mesmo da cotação.", envolvidos: "", relacao: "", quemsabe: "", email: "analista.ti.correto@email.com", data: "10/11/2025", status: "nova" },
-  { id: 6, categoria: "VAZAMENTO DE DADOS", descricao: "A lista de e-mails e CPFs de todos os clientes premium está disponível em uma pasta pública na rede interna (\\\\server\\public\\clientes_premium.xls), sem proteção alguma.", evidencias: "O caminho da pasta está na descrição.", envolvidos: "", relacao: "", quemsabe: "", email: "", data: "09/11/2025", status: "nova" },
-  { id: 7, categoria: "AMEAÇA / AGRESSÃO", descricao: "Um funcionário do time de logística ameaçou um motorista terceirizado no pátio, dizendo que 'ia pegar ele lá fora' porque ele demorou para manobrar.", evidencias: "A câmera 04 do pátio deve ter gravado a discussão.", envolvidos: "", relacao: "", quemsabe: "", email: "seguranca.patrimonial@email.com", data: "05/11/2025", status: "andamento" },
-  { id: 8, categoria: "ASSÉDIO SEXUAL", descricao: "Meu coordenador (Marcos) vive fazendo 'elogios' ao meu corpo e me chamando para 'happy hour' só nós dois, mesmo eu já tendo dito não. Hoje ele tocou meu ombro e desceu a mão nas minhas costas.", evidencias: "Tenho prints de mensagens dele no Teams.", envolvidos: "Coordenador Marcos P.", relacao: "Estagiária", quemsabe: "Minha colega de baia (Juliana) viu a cena de hoje.", email: "estagiaria.constrangida@email.com", data: "04/11/2025", status: "andamento" },
-  { id: 9, categoria: "FRAUDE", descricao: "O ponto eletrônico está sendo batido por outra pessoa para cobrir faltas de um funcionário do financeiro. O 'amigo' bate o ponto para ele às 8h, mas ele só chega às 10h.", evidencias: "Podem puxar as câmeras da entrada às 8h e comparar com o login.", envolvidos: "", relacao: "", quemsabe: "", email: "", data: "03/11/2025", status: "andamento" },
-  { id: 10, categoria: "SAUDE E SEGURANÇA", descricao: "Fiação exposta no corredor do segundo andar, perto da máquina de café. Já deu curto-circuito duas vezes essa semana. Alguém vai tomar um choque.", evidencias: "Foto anexa.", envolvidos: "", relacao: "", quemsabe: "", email: "alerta.manutencao@email.com", data: "01/11/2025", status: "andamento" },
-  { id: 11, categoria: "OUTROS (Uso Indevido)", descricao: "O carro da empresa (Placa ABC-1234, modelo Onix) está sendo usado para fins pessoais pelo gerente de contas todo fim de semana. Ele leva os filhos na praia com o carro.", evidencias: "Vi o carro no estacionamento de um shopping no sábado.", envolvidos: "Gerente de Contas (Fábio)", relacao: "Analista de Frota", quemsabe: "Se puxarem o rastreador GPS, vão confirmar.", email: "controle.frota@email.com", data: "30/10/2025", status: "andamento" },
-  { id: 12, categoria: "ASSÉDIO MORAL", descricao: "A liderança da equipe de TI está sobrecarregando um funcionário específico de propósito, tirando ele de projetos e passando tarefas operacionais repetitivas, para forçar ele a pedir demissão.", evidencias: "Basta ver o histórico de alocação de tarefas dele no Jira dos últimos 3 meses.", envolvidos: "", relacao: "", quemsabe: "", email: "", data: "28/10/2025", status: "andamento" },
-  { id: 13, categoria: "FRAUDE (Suborno)", descricao: "Recebemos um fornecedor que nos ofereceu 5% de comissão 'por fora' para ganhar a concorrência. (Investigação concluída, fornecedor bloqueado e política reforçada).", evidencias: "Proposta de e-mail do fornecedor.", envolvidos: "", relacao: "", quemsabe: "", email: "compras.compliance@email.com", data: "15/10/2025", status: "finalizado" },
-  { id: 14, categoria: "AMEAÇA / AGRESSÃO", descricao: "Discussão entre dois colegas que escalou para agressão verbal e empurrões. (Medidas disciplinares aplicadas em ambos após análise das câmeras).", evidencias: "Testemunho da equipe e câmeras internas.", envolvidos: "Funcionário A e Funcionário B", relacao: "Líder de Equipe", quemsabe: "Toda a equipe de operações.", email: "lider.equipe@email.com", data: "10/10/2025", status: "finalizado" },
-  { id: 15, categoria: "SAUDE E SEGURANÇA", descricao: "Denúncia sobre falta de EPIs (luvas térmicas) na área da caldeira. (Auditoria realizada, EPIs fornecidos e supervisor treinado).", evidencias: "Sem evidências, apenas relato.", envolvidos: "", relacao: "", quemsabe: "", email: "", data: "05/10/2025", status: "finalizado" },
-  { id: 16, categoria: "ASSÉDIO MORAL", descricao: "Líder que fazia piadas constrangedoras sobre a aparência dos subordinados. (Líder passou por treinamento de conduta e foi advertido formalmente).", evidencias: "Relatos de 3 testemunhas.", envolvidos: "", relacao: "", quemsabe: "", email: "nao.aguento.mais@email.com", data: "01/10/2025", status: "finalizado" },
-  { id: 17, categoria: "VAZAMENTO DE DADOS", descricao: "Falha no portal do cliente que permitia, ao trocar o ID na URL, ver dados de outros usuários. (Falha crítica corrigida pela equipe de dev em 2 horas).", evidencias: "Vídeo gravando a tela mostrando a falha.", envolvidos: "Equipe de TI", relacao: "Cliente (Externo)", quemsabe: "N/A", email: "cliente.atento@email.com", data: "28/09/2025", status: "finalizado" },
-  { id: 18, categoria: "CONFLITO DE INTERESSES", descricao: "Funcionário do financeiro aprovando pagamentos para empresa de buffet da própria esposa sem cotação. (Funcionário desligado após investigação).", evidencias: "CNPJ da empresa da esposa e notas fiscais aprovadas.", envolvidos: "", relacao: "", quemsabe: "", email: "", data: "20/09/2025", status: "finalizado" },
-]
+// TODO: Buscar relatos do backend
+const mockRelatos: any[] = []
 
 interface Comment {
   id: number
@@ -48,20 +25,10 @@ export default function RelatosOperadorPage() {
   const [showCommentDialog, setShowCommentDialog] = useState(false)
   const [showReopenDialog, setShowReopenDialog] = useState(false)
   const [commentText, setCommentText] = useState("")
-  const [comments, setComments] = useState<Record<number, Comment[]>>({
-    7: [{ id: 1, texto: "Iniciamos a investigação. Entrevistamos o funcionário do time de logística e revisamos as gravações da câmera 04.", data: "06/11/2025", autor: "Operador" }, { id: 2, texto: "Aguardando depoimento do motorista terceirizado. Previsão de conclusão: 10/11/2025.", data: "07/11/2025", autor: "Operador" }],
-    8: [{ id: 1, texto: "Coordenador foi notificado e afastado preventivamente. Iniciando processo de apuração.", data: "05/11/2025", autor: "Operador" }],
-    13: [{ id: 1, texto: "Investigação iniciada. Fornecedor foi contatado e proposta de suborno confirmada.", data: "16/10/2025", autor: "Operador" }, { id: 2, texto: "Fornecedor bloqueado no sistema. Política de compliance reforçada com toda a equipe de compras.", data: "18/10/2025", autor: "Operador" }],
-    14: [{ id: 1, texto: "Câmeras revisadas. Ambos os funcionários foram identificados e chamados para depoimento.", data: "11/10/2025", autor: "Operador" }]
-  })
-  const [finalResponses, setFinalResponses] = useState<Record<number, string>>({
-    13: "Investigação concluída. Fornecedor foi bloqueado permanentemente e política de compliance foi reforçada com toda a equipe de compras. Todos os processos de licitação foram revisados.",
-    14: "Medidas disciplinares aplicadas em ambos os funcionários após análise das câmeras. Ambos receberam advertência formal e foram orientados sobre conduta profissional.",
-    15: "Auditoria realizada na área da caldeira. EPIs (luvas térmicas) foram fornecidos imediatamente e o supervisor passou por treinamento obrigatório de segurança.",
-    16: "Líder passou por treinamento de conduta e foi advertido formalmente. Monitoramento contínuo implementado.",
-    17: "Falha crítica corrigida pela equipe de desenvolvimento em 2 horas. Patch de segurança aplicado e testes de penetração realizados.",
-    18: "Funcionário desligado após investigação confirmar conflito de interesses. Processo de aprovação de pagamentos foi revisado e novas salvaguardas implementadas."
-  })
+  // TODO: Buscar comentários do backend
+  const [comments, setComments] = useState<Record<number, Comment[]>>({})
+  // TODO: Buscar respostas finais do backend
+  const [finalResponses, setFinalResponses] = useState<Record<number, string>>({})
 
   const filteredRelatos = mockRelatos.filter((r) => r.status === statusFilter)
   const detailedRelato = mockRelatos.find((r) => r.id === selectedRelato)

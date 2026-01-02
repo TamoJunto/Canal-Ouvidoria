@@ -2,17 +2,26 @@ import type React from "react"
 import { Header } from "@/components/header"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Upload, X } from "lucide-react"
+import { Upload, X, Loader2 } from "lucide-react"
 import { useState } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
+import { relatosPublicApi } from "@/services"
 
 export default function AnexosPage() {
   const [anexos, setAnexos] = useState<File[]>([])
+  const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
   const location = useLocation()
   
-  // Pega a informação se não se identificou do state da navegação
-  const naoSeIdentificou = (location.state as { naoSeIdentificou?: boolean })?.naoSeIdentificou || false
+  const locationState = location.state as { 
+    protocol?: string; 
+    naoSeIdentificou?: boolean;
+    receberProtocoloPorEmail?: boolean;
+  } | undefined
+  
+  const protocol = locationState?.protocol
+  const naoSeIdentificou = locationState?.naoSeIdentificou || false
+  const receberProtocoloPorEmail = locationState?.receberProtocoloPorEmail || false
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       if (e.target.files) {
@@ -24,9 +33,36 @@ export default function AnexosPage() {
       setAnexos(anexos.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    navigate("/faca-seu-relato/relatofeito", { state: { naoSeIdentificou } })
+    
+    if (!protocol) {
+      alert('Protocolo não encontrado. Por favor, crie o relato novamente.')
+      navigate('/faca-seu-relato')
+      return
+    }
+    
+    // Se tem anexos, faz upload
+    if (anexos.length > 0) {
+      setLoading(true)
+      try {
+        await relatosPublicApi.uploadAnexos(protocol, anexos)
+        console.log('Anexos enviados com sucesso!')
+      } catch (error: any) {
+        console.error('Erro ao enviar anexos:', error)
+        alert(error.response?.data?.message || 'Erro ao enviar anexos. Prosseguindo...')
+      } finally {
+        setLoading(false)
+      }
+    }
+    
+    navigate("/faca-seu-relato/relatofeito", { 
+      state: { 
+        protocol,
+        naoSeIdentificou,
+        receberProtocoloPorEmail
+      } 
+    })
   }
 
   return (
@@ -82,9 +118,17 @@ export default function AnexosPage() {
             <div className="flex items-center justify-between pt-4 mt-auto">
                 <Button
                   type="submit"
+                  disabled={loading}
                   className="bg-accent hover:bg-accent/90 text-primary font-semibold uppercase tracking-wide px-4 py-2"
                 >
-                  Prosseguir
+                  {loading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Enviando...
+                    </>
+                  ) : (
+                    'Prosseguir'
+                  )}
                 </Button>
 
               <span className="text-white text-4xl font-light">2</span>

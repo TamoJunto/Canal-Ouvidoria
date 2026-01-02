@@ -11,6 +11,7 @@ export default defineConfig({
     }
   },
   server: {
-    port: 3000
+    port: 3002,
+    strictPort: true, // Falha se a porta estiver ocupada (ao invés de escolher outra)
   }
 })

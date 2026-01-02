@@ -7,11 +7,16 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 export default function SucessoPage() {
   const location = useLocation()
-  const locationState = location.state as { naoSeIdentificou?: boolean; receberProtocoloPorEmail?: boolean } | undefined
+  const locationState = location.state as { 
+    protocol?: string;
+    naoSeIdentificou?: boolean; 
+    receberProtocoloPorEmail?: boolean;
+  } | undefined
+  
+  const protocolo = locationState?.protocol || "ERRO-000000"
   const naoSeIdentificou = locationState?.naoSeIdentificou ?? false
   const receberProtocoloPorEmail = locationState?.receberProtocoloPorEmail ?? !naoSeIdentificou
 
-  const protocolo = "ZXA-S0R"
   const [copied, setCopied] = useState(false)
   const [hasCopied, setHasCopied] = useState(false)
 

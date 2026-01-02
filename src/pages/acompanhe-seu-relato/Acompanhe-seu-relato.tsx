@@ -3,87 +3,64 @@ import { Header } from "@/components/header"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
-import { Search, X, MessageSquare, Clock, CheckCircle, Send, AlertCircle } from "lucide-react"
+import { Search, X, MessageSquare, Clock, CheckCircle, Send, AlertCircle, Loader2, Download, Paperclip } from "lucide-react"
 import { useState } from "react"
 import { Textarea } from "@/components/ui/textarea"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-
-// Mock de relatos com diferentes status
-const mockRelatos: Record<string, {
-  protocolo: string
-  descricao: string
-  status: "pendente" | "respondido"
-  resposta?: string
-  dataEnvio: string
-  dataResposta?: string
-  mensagensEnviadas?: { texto: string; data: string }[]
-}> = {
-  "ZXA-S0R": {
-    protocolo: "ZXA-S0R",
-    descricao: "Relato sobre comportamento inadequado de um supervisor durante reuniões de equipe. O supervisor tem utilizado linguagem inadequada e feito comentários desrespeitosos.",
-    status: "pendente",
-    dataEnvio: "14/11/2025",
-    mensagensEnviadas: [
-      { texto: "Gostaria de adicionar que esse comportamento se repete todas as semanas.", data: "16/11/2025" }
-    ]
-  },
-  "ABC-123": {
-    protocolo: "ABC-123",
-    descricao: "Denúncia sobre possível conflito de interesses na contratação de fornecedores.",
-    status: "respondido",
-    dataEnvio: "10/11/2025",
-    dataResposta: "15/11/2025",
-    resposta: "Agradecemos seu relato. Iniciamos uma investigação interna sobre o caso mencionado. Nossa equipe de compliance está analisando todas as informações fornecidas e tomaremos as medidas necessárias. Você será informado sobre o andamento em breve.",
-    mensagensEnviadas: [
-      { texto: "Consegui mais informações sobre o caso. O fornecedor X também está envolvido.", data: "12/11/2025" }
-    ]
-  },
-  "XYZ-789": {
-    protocolo: "XYZ-789",
-    descricao: "Relato sobre situação de assédio moral no ambiente de trabalho.",
-    status: "pendente",
-    dataEnvio: "12/11/2025"
-  }
-}
+import { relatosPublicApi } from "@/services"
+import type { RelatoPublico, Anexo } from "@/services"
 
 export default function AcompanheSeuRelato() {
   const [protocolo, setProtocolo] = useState("")
   const [showResults, setShowResults] = useState(false)
   const [showResponseDialog, setShowResponseDialog] = useState(false)
   const [responseText, setResponseText] = useState("")
-  const [relatoEncontrado, setRelatoEncontrado] = useState<typeof mockRelatos[string] | null>(null)
+  const [relatoEncontrado, setRelatoEncontrado] = useState<RelatoPublico | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [enviandoMensagem, setEnviandoMensagem] = useState(false)
+  const [errorMessage, setErrorMessage] = useState("")
+  const [anexos, setAnexos] = useState<Anexo[]>([])
+  const [loadingAnexos, setLoadingAnexos] = useState(false)
 
-  // Função para calcular dias desde o envio
-  const calcularDiasDesdeEnvio = (dataEnvio: string): number => {
-    const partes = dataEnvio.split("/")
-    const dataRelato = new Date(Number(partes[2]), Number(partes[1]) - 1, Number(partes[0]))
-    const hoje = new Date()
-    const diffTime = Math.abs(hoje.getTime() - dataRelato.getTime())
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-    return diffDays
-  }
-
-  // Verifica se pode enviar mensagem (até 15 dias)
-  const podeEnviarMensagem = relatoEncontrado 
-    ? calcularDiasDesdeEnvio(relatoEncontrado.dataEnvio) <= 15 
-    : false
-  
-  const diasPassados = relatoEncontrado 
-    ? calcularDiasDesdeEnvio(relatoEncontrado.dataEnvio) 
-    : 0
-
-  const handleSearch = (e: FormEvent) => {
+  const handleSearch = async (e: FormEvent) => {
     e.preventDefault()
-    if (protocolo.trim()) {
-      const relato = mockRelatos[protocolo.toUpperCase()]
-      if (relato) {
-        setRelatoEncontrado(relato)
-        setShowResults(true)
-      } else {
-        // Protocolo não encontrado
-        setRelatoEncontrado(null)
-        setShowResults(true)
+    if (!protocolo.trim()) return
+
+    setLoading(true)
+    setErrorMessage("")
+    try {
+      console.log('Buscando protocolo:', protocolo.toUpperCase())
+      const relato = await relatosPublicApi.getRelatoByProtocol(protocolo.toUpperCase())
+      console.log('Relato encontrado:', relato)
+      console.log('Tem resposta_final?', (relato as any)?.resposta_final)
+      console.log('Timeline:', relato.timeline)
+      setRelatoEncontrado(relato)
+      setShowResults(true)
+      
+      // Buscar anexos
+      loadAnexos(protocolo.toUpperCase())
+    } catch (error: any) {
+      console.error('Erro completo:', error)
+      console.error('Status:', error.response?.status)
+      console.error('Dados do erro:', error.response?.data)
+      
+      let mensagemErro = 'Protocolo não encontrado'
+      
+      if (error.response?.status === 500) {
+        mensagemErro = 'Erro no servidor ao buscar o relato. Verifique o console do BACKEND para mais detalhes.'
+      } else if (error.response?.status === 404) {
+        mensagemErro = 'Protocolo não encontrado no sistema.'
+      } else if (error.response?.data?.message) {
+        mensagemErro = error.response.data.message
+      } else if (error.response?.data?.error?.message) {
+        mensagemErro = error.response.data.error.message
       }
+      
+      setErrorMessage(mensagemErro)
+      setRelatoEncontrado(null)
+      setShowResults(true)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -91,16 +68,61 @@ export default function AcompanheSeuRelato() {
     setProtocolo("")
     setShowResults(false)
     setRelatoEncontrado(null)
+    setAnexos([])
   }
 
-  const handleSendResponse = () => {
-    if (responseText.trim()) {
-      // Aqui você enviaria a resposta para o backend
-      console.log("Resposta enviada:", responseText)
+  const loadAnexos = async (protocoloParam: string) => {
+    setLoadingAnexos(true)
+    try {
+      const anexosData = await relatosPublicApi.getAnexos(protocoloParam)
+      setAnexos(anexosData || [])
+    } catch (error) {
+      console.error('Erro ao carregar anexos:', error)
+      setAnexos([])
+    } finally {
+      setLoadingAnexos(false)
+    }
+  }
+
+  const handleDownloadAnexo = async (anexoId: number, nomeOriginal: string) => {
+    if (!relatoEncontrado) return
+    try {
+      const blob = await relatosPublicApi.downloadAnexo(relatoEncontrado.protocol, anexoId)
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = nomeOriginal
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      window.URL.revokeObjectURL(url)
+    } catch (error) {
+      alert('Erro ao baixar anexo')
+    }
+  }
+
+  const handleSendResponse = async () => {
+    if (!responseText.trim() || !relatoEncontrado) return
+
+    setEnviandoMensagem(true)
+    try {
+      await relatosPublicApi.createMensagem(relatoEncontrado.protocol, responseText)
+      
       setShowResponseDialog(false)
       setResponseText("")
-      // Poderia mostrar uma mensagem de sucesso
+      
       alert("Sua mensagem foi enviada com sucesso! Nossa equipe irá analisar e responder em breve.")
+      
+      // Recarrega o relato para ver a mensagem enviada
+      const relatoAtualizado = await relatosPublicApi.getRelatoByProtocol(relatoEncontrado.protocol)
+      setRelatoEncontrado(relatoAtualizado)
+    } catch (error: any) {
+      alert(
+        error.response?.data?.message || 
+        'Erro ao enviar mensagem. Tente novamente.'
+      )
+    } finally {
+      setEnviandoMensagem(false)
     }
   }
 
@@ -134,11 +156,16 @@ export default function AcompanheSeuRelato() {
                     </button>
                   )}
                   <button 
-                    type="submit" 
-                    className="hover:opacity-70 transition-opacity"
+                    type="submit"
+                    disabled={loading}
+                    className="hover:opacity-70 transition-opacity disabled:opacity-50"
                     title="Buscar"
                   >
-                    <Search className="w-5 h-5 text-muted-foreground" />
+                    {loading ? (
+                      <Loader2 className="w-5 h-5 text-muted-foreground animate-spin" />
+                    ) : (
+                      <Search className="w-5 h-5 text-muted-foreground" />
+                    )}
                   </button>
                 </div>
               </div>
@@ -153,117 +180,128 @@ export default function AcompanheSeuRelato() {
                       <h2 className="text-2xl font-bold mb-4">Meu Relato</h2>
                       <div className="space-y-2 mb-4">
                         <p className="text-sm text-white/80">
-                          <span className="font-semibold">Protocolo:</span> {relatoEncontrado.protocolo}
+                          <span className="font-semibold">Protocolo:</span> {relatoEncontrado.protocol}
                         </p>
                         <p className="text-sm text-white/80">
-                          <span className="font-semibold">Data de envio:</span> {relatoEncontrado.dataEnvio}
+                          <span className="font-semibold">Tipo:</span> {relatoEncontrado.type}
+                        </p>
+                        <p className="text-sm text-white/80">
+                          <span className="font-semibold">Data de envio:</span> {new Date(relatoEncontrado.created_at).toLocaleDateString('pt-BR')}
                         </p>
                         <p className="text-sm text-white/80">
                           <span className="font-semibold">Status:</span>{" "}
-                          <span className={relatoEncontrado.status === "respondido" ? "text-green-300 font-semibold" : "text-yellow-300 font-semibold"}>
-                            {relatoEncontrado.status === "respondido" ? "Respondido" : "Em análise"}
+                          <span className="text-yellow-300 font-semibold">
+                            {relatoEncontrado.status}
                           </span>
                         </p>
                       </div>
                       <p className="text-sm leading-relaxed bg-white text-foreground p-4 rounded-lg">
-                        {relatoEncontrado.descricao}
+                        {relatoEncontrado.description}
                       </p>
                     </div>
 
-                    {/* Resposta da empresa */}
-                    {relatoEncontrado.status === "respondido" && relatoEncontrado.resposta ? (
+                    {/* Resposta Final */}
+                    {(relatoEncontrado as any)?.resposta_final && (
                       <div>
                         <div className="flex items-center gap-2 mb-4">
-                          <CheckCircle className="h-5 w-5 text-blue-300" />
-                          <h3 className="text-xl font-bold">Relato Finalizado</h3>
+                          <CheckCircle className="h-5 w-5 text-green-300" />
+                          <h3 className="text-xl font-bold">Resposta da Equipe</h3>
                         </div>
-                        {relatoEncontrado.dataResposta && (
-                          <p className="text-sm text-white/80 mb-2">
-                            Respondido em: {relatoEncontrado.dataResposta}
+                        <div className="bg-green-50 border-l-4 border-green-500 rounded-lg p-4 text-foreground">
+                          {(relatoEncontrado as any)?.respondido_em && (
+                            <p className="text-xs text-gray-500 mb-3">
+                              Respondido em: {new Date((relatoEncontrado as any).respondido_em).toLocaleString('pt-BR')}
+                            </p>
+                          )}
+                          <p className="text-sm leading-relaxed mb-4">
+                            {(relatoEncontrado as any).resposta_final}
                           </p>
-                        )}
-                        <div className="bg-white text-foreground p-4 rounded-lg">
-                          <p className="text-sm leading-relaxed">
-                            {relatoEncontrado.resposta}
-                          </p>
-                        </div>
-                      </div>
-                    ) : (
-                      <div>
-                        <div className="flex items-center gap-2 mb-4">
-                          <Clock className="h-5 w-5 text-yellow-300" />
-                          <h3 className="text-xl font-bold">Status do Relato</h3>
-                        </div>
-                        <div className="bg-yellow-500/20 border border-yellow-400/50 p-4 rounded-lg">
-                          <p className="text-sm leading-relaxed">
-                            Seu relato está em análise pela nossa equipe. Você será notificado assim que houver uma resposta.
-                          </p>
+                          
+                          {/* Anexos da Resposta */}
+                          {anexos.length > 0 && (
+                            <div className="mt-4 pt-4 border-t border-green-200">
+                              <div className="flex items-center gap-2 mb-3">
+                                <Paperclip className="h-4 w-4 text-green-700" />
+                                <h4 className="text-sm font-semibold text-green-700">
+                                  Arquivos Anexados ({anexos.length})
+                                </h4>
+                              </div>
+                              <div className="space-y-2">
+                                {anexos.map((anexo) => (
+                                  <div key={anexo.id} className="flex items-center justify-between bg-white p-3 rounded border border-green-200">
+                                    <div className="flex-1">
+                                      <p className="text-sm font-medium text-gray-900">{anexo.nome_original}</p>
+                                      <p className="text-xs text-gray-500">
+                                        {(anexo.tamanho / 1024).toFixed(2)} KB
+                                      </p>
+                                    </div>
+                                    <Button
+                                      onClick={() => handleDownloadAnexo(anexo.id, anexo.nome_original)}
+                                      size="sm"
+                                      className="bg-green-600 hover:bg-green-700 text-white ml-4"
+                                    >
+                                      <Download className="h-4 w-4" />
+                                    </Button>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </div>
                     )}
 
-                    {/* Mensagens enviadas pelo denunciante */}
-                    {relatoEncontrado.mensagensEnviadas && relatoEncontrado.mensagensEnviadas.length > 0 && (
+                    {/* Histórico de Mensagens */}
+                    {relatoEncontrado.timeline && relatoEncontrado.timeline.length > 0 && (
                       <div>
                         <div className="flex items-center gap-2 mb-4">
                           <MessageSquare className="h-5 w-5 text-blue-300" />
-                          <h3 className="text-xl font-bold">Minhas Mensagens</h3>
+                          <h3 className="text-xl font-bold">Suas Mensagens</h3>
                         </div>
                         <div className="space-y-3">
-                          {relatoEncontrado.mensagensEnviadas.map((mensagem, index) => (
+                          {relatoEncontrado.timeline
+                            .filter(event => event.type === 'MENSAGEM_PUBLICA' || event.type === 'RESPOSTA_FINAL')
+                            .map((event, index) => (
                             <div key={index} className="bg-white text-foreground p-4 rounded-lg">
                               <p className="text-xs text-muted-foreground mb-2">
-                                Enviada em: {mensagem.data}
+                                {new Date(event.timestamp).toLocaleString('pt-BR')}
                               </p>
-                              <p className="text-sm leading-relaxed">
-                                {mensagem.texto}
-                              </p>
+                              {event.content && typeof event.content === 'object' && (
+                                <p className="text-sm leading-relaxed">
+                                  {event.content.mensagem || event.content.texto || JSON.stringify(event.content)}
+                                </p>
+                              )}
                             </div>
                           ))}
                         </div>
                       </div>
                     )}
 
-                    {/* Alerta sobre limite de 15 dias */}
-                    {relatoEncontrado.status === "pendente" && (
-                      <div className="flex items-start gap-3 rounded-2xl border border-orange-400/70 bg-orange-50 p-4 text-sm text-orange-900">
-                        <AlertCircle className="h-5 w-5 text-orange-600 mt-0.5 flex-shrink-0" />
-                        <div>
-                          <p className="font-semibold">Prazo para envio de mensagens</p>
-                          <p>
-                            {podeEnviarMensagem 
-                              ? `Você pode enviar mensagens até 15 dias após o envio do relato. Restam ${15 - diasPassados} dias.`
-                              : "O prazo de 15 dias para envio de mensagens já expirou. Para novos apontamentos, abra um novo protocolo."
-                            }
-                          </p>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Botão para enviar mensagem/resposta */}
-                    {relatoEncontrado.status === "pendente" ? (
+                    {/* Botão para enviar mensagem */}
+                    {relatoEncontrado.status !== 'FINALIZADO' && relatoEncontrado.status !== 'ARQUIVADO' && (
                       <div className="flex justify-center pt-4">
                         <Button
                           onClick={() => setShowResponseDialog(true)}
-                          disabled={!podeEnviarMensagem}
-                          className="bg-white hover:bg-white/90 text-primary font-semibold px-8 py-6 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="bg-white hover:bg-white/90 text-primary font-semibold px-8 py-6 flex items-center gap-2"
                         >
                           <MessageSquare className="h-5 w-5" />
                           Enviar Mensagem
                         </Button>
                       </div>
-                    ) : (
-                      <div className="mt-6 bg-white/10 border border-white/20 rounded-2xl p-4 text-center text-sm text-white/80">
-                        Relato encerrado. Para novos apontamentos, abra um novo protocolo.
-                      </div>
                     )}
                   </>
                 ) : (
                   <div className="text-center py-12">
+                    <AlertCircle className="h-16 w-16 text-red-300 mx-auto mb-4" />
                     <p className="text-white text-lg mb-2">Protocolo não encontrado</p>
-                    <p className="text-white/80 text-sm">
-                      Verifique se o protocolo está correto e tente novamente.
+                    <p className="text-white/80 text-sm mb-4">
+                      {errorMessage || 'Verifique se o protocolo está correto e tente novamente.'}
                     </p>
+                    <div className="bg-white/10 border border-white/20 rounded-lg p-4 text-left text-sm text-white/80 max-w-md mx-auto">
+                      <p className="font-semibold mb-2">Formato correto do protocolo:</p>
+                      <p className="font-mono">AAAA-XXXXXX</p>
+                      <p className="mt-2">Exemplo: <span className="font-mono">2025-ABC123</span></p>
+                    </div>
                   </div>
                 )}
               </div>
@@ -309,10 +347,19 @@ export default function AcompanheSeuRelato() {
               <Button
                 className="bg-primary hover:bg-primary/90 text-white px-8 flex items-center gap-2"
                 onClick={handleSendResponse}
-                disabled={!responseText.trim()}
+                disabled={!responseText.trim() || enviandoMensagem}
               >
-                <Send className="h-4 w-4" />
-                Enviar Mensagem
+                {enviandoMensagem ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Enviando...
+                  </>
+                ) : (
+                  <>
+                    <Send className="h-4 w-4" />
+                    Enviar Mensagem
+                  </>
+                )}
               </Button>
             </div>
           </div>
