@@ -38,6 +38,9 @@ export interface Report {
   status: ReportStatus;
   priority: ReportPriority;
   
+  resposta_final?: string | null;
+  respondido_em?: Date | null;
+  
   created_at: Date;
   updated_at: Date;
 }

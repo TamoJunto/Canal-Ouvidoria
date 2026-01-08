@@ -19,8 +19,8 @@ export interface TokenPair {
 const PRIVATE_KEY = process.env.JWT_PRIVATE_KEY?.replace(/\\n/g, '\n') || '';
 const PUBLIC_KEY = process.env.JWT_PUBLIC_KEY?.replace(/\\n/g, '\n') || '';
 
-const ACCESS_TOKEN_EXPIRATION = process.env.JWT_ACCESS_EXPIRATION || '15m';
-const REFRESH_TOKEN_EXPIRATION = process.env.JWT_REFRESH_EXPIRATION || '7d';
+const ACCESS_TOKEN_EXPIRATION: string = process.env.JWT_ACCESS_EXPIRATION || '15m';
+const REFRESH_TOKEN_EXPIRATION: string = process.env.JWT_REFRESH_EXPIRATION || '7d';
 
 if (!PRIVATE_KEY || !PUBLIC_KEY) {
   logger.warn('Chaves JWT não configuradas! Usando algoritmo HS256 (NÃO RECOMENDADO EM PRODUÇÃO)');
@@ -47,15 +47,15 @@ export class JWTService {
     if (PRIVATE_KEY) {
       return jwt.sign(payload, PRIVATE_KEY, {
         algorithm: 'RS256',
-        expiresIn: ACCESS_TOKEN_EXPIRATION as string,
-      });
+        expiresIn: ACCESS_TOKEN_EXPIRATION,
+      } as jwt.SignOptions);
     }
 
     // Fallback para desenvolvimento (não usar em produção!)
     return jwt.sign(payload, 'dev-secret-key', {
       algorithm: 'HS256',
-      expiresIn: ACCESS_TOKEN_EXPIRATION as string,
-    });
+      expiresIn: ACCESS_TOKEN_EXPIRATION,
+    } as jwt.SignOptions);
   }
 
   /**
@@ -65,15 +65,15 @@ export class JWTService {
     if (PRIVATE_KEY) {
       return jwt.sign(payload, PRIVATE_KEY, {
         algorithm: 'RS256',
-        expiresIn: REFRESH_TOKEN_EXPIRATION as string,
-      });
+        expiresIn: REFRESH_TOKEN_EXPIRATION,
+      } as jwt.SignOptions);
     }
 
     // Fallback para desenvolvimento
     return jwt.sign(payload, 'dev-secret-key', {
       algorithm: 'HS256',
-      expiresIn: REFRESH_TOKEN_EXPIRATION as string,
-    });
+      expiresIn: REFRESH_TOKEN_EXPIRATION,
+    } as jwt.SignOptions);
   }
 
   /**

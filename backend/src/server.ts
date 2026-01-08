@@ -10,7 +10,6 @@ import { errorHandler, notFoundHandler } from '@middlewares/error-handler';
 import { generalRateLimiter } from '@middlewares/rate-limit.middleware';
 import authRoutes from '@modules/auth/auth.routes';
 import relatosPublicRoutes from '@modules/relatos/public/relatos-public.routes';
-import { initDatabase } from '@config/database'
 import { initStorage } from '@config/storage'
 import relatosAuthRoutes from '@modules/relatos/authenticated/relatos-auth.routes';
 import usuariosRoutes from '@modules/usuarios/usuarios.routes';
