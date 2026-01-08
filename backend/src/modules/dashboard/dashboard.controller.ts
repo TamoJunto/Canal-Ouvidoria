@@ -2,14 +2,6 @@ import { Request, Response, NextFunction } from 'express';
 import { DashboardService } from './dashboard.service';
 import { AppError } from '@middlewares/error-handler';
 
-interface AuthRequest extends Request {
-  user?: {
-    userId: string;
-    email: string;
-    tipo: string;
-  };
-}
-
 export class DashboardController {
   private service: DashboardService;
 
@@ -27,7 +19,7 @@ export class DashboardController {
   }
 
   // GET /api/dashboard - Dashboard completo
-  getDashboard = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  getDashboard = async (req: Request, res: Response, next: NextFunction) => {
     try {
       if (!req.user) {
         throw new AppError('Usuário não autenticado', 401);
@@ -42,7 +34,7 @@ export class DashboardController {
   };
 
   // GET /api/dashboard/kpis
-  getKPIs = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  getKPIs = async (req: Request, res: Response, next: NextFunction) => {
     try {
       if (!req.user) {
         throw new AppError('Usuário não autenticado', 401);
@@ -57,7 +49,7 @@ export class DashboardController {
   };
 
   // GET /api/dashboard/por-status
-  getPorStatus = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  getPorStatus = async (req: Request, res: Response, next: NextFunction) => {
     try {
       if (!req.user) {
         throw new AppError('Usuário não autenticado', 401);
@@ -72,7 +64,7 @@ export class DashboardController {
   };
 
   // GET /api/dashboard/por-tipo
-  getPorTipo = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  getPorTipo = async (req: Request, res: Response, next: NextFunction) => {
     try {
       if (!req.user) {
         throw new AppError('Usuário não autenticado', 401);
@@ -87,7 +79,7 @@ export class DashboardController {
   };
 
   // GET /api/dashboard/por-prioridade
-  getPorPrioridade = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  getPorPrioridade = async (req: Request, res: Response, next: NextFunction) => {
     try {
       if (!req.user) {
         throw new AppError('Usuário não autenticado', 401);
@@ -102,7 +94,7 @@ export class DashboardController {
   };
 
   // GET /api/dashboard/por-comite
-  getPorComite = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  getPorComite = async (req: Request, res: Response, next: NextFunction) => {
     try {
       if (!req.user) {
         throw new AppError('Usuário não autenticado', 401);
@@ -117,7 +109,7 @@ export class DashboardController {
   };
 
   // GET /api/dashboard/por-periodo
-  getPorPeriodo = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  getPorPeriodo = async (req: Request, res: Response, next: NextFunction) => {
     try {
       if (!req.user) {
         throw new AppError('Usuário não autenticado', 401);
@@ -132,7 +124,7 @@ export class DashboardController {
   };
 
   // GET /api/dashboard/tempo-medio
-  getTempoMedio = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  getTempoMedio = async (req: Request, res: Response, next: NextFunction) => {
     try {
       if (!req.user) {
         throw new AppError('Usuário não autenticado', 401);
@@ -147,7 +139,7 @@ export class DashboardController {
   };
 
   // GET /api/dashboard/exportar
-  exportar = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  exportar = async (req: Request, res: Response, next: NextFunction) => {
     try {
       if (!req.user) {
         throw new AppError('Usuário não autenticado', 401);

@@ -2,14 +2,6 @@ import { Request, Response, NextFunction } from 'express';
 import { ComitesService } from './comites.service';
 import { AppError } from '@middlewares/error-handler';
 
-interface AuthRequest extends Request {
-  user?: {
-    userId: string;
-    email: string;
-    tipo: string;
-  };
-}
-
 export class ComitesController {
   private service: ComitesService;
 
@@ -17,7 +9,7 @@ export class ComitesController {
     this.service = new ComitesService();
   }
 
-  listar = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  listar = async (req: Request, res: Response, next: NextFunction) => {
     try {
       if (!req.user) {
         throw new AppError('Usuário não autenticado', 401);
@@ -37,7 +29,7 @@ export class ComitesController {
     }
   };
 
-  getById = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  getById = async (req: Request, res: Response, next: NextFunction) => {
     try {
       if (!req.user) {
         throw new AppError('Usuário não autenticado', 401);
@@ -51,7 +43,7 @@ export class ComitesController {
     }
   };
 
-  criar = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  criar = async (req: Request, res: Response, next: NextFunction) => {
     try {
       if (!req.user) {
         throw new AppError('Usuário não autenticado', 401);
@@ -70,7 +62,7 @@ export class ComitesController {
     }
   };
 
-  atualizar = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  atualizar = async (req: Request, res: Response, next: NextFunction) => {
     try {
       if (!req.user) {
         throw new AppError('Usuário não autenticado', 401);
@@ -91,7 +83,7 @@ export class ComitesController {
     }
   };
 
-  desativar = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  desativar = async (req: Request, res: Response, next: NextFunction) => {
     try {
       if (!req.user) {
         throw new AppError('Usuário não autenticado', 401);
@@ -105,7 +97,7 @@ export class ComitesController {
     }
   };
 
-  reativar = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  reativar = async (req: Request, res: Response, next: NextFunction) => {
     try {
       if (!req.user) {
         throw new AppError('Usuário não autenticado', 401);
@@ -119,7 +111,7 @@ export class ComitesController {
     }
   };
 
-  excluir = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  excluir = async (req: Request, res: Response, next: NextFunction) => {
     try {
       if (!req.user) {
         throw new AppError('Usuário não autenticado', 401);
@@ -133,7 +125,7 @@ export class ComitesController {
     }
   };
 
-  addMembro = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  addMembro = async (req: Request, res: Response, next: NextFunction) => {
     try {
       if (!req.user) {
         throw new AppError('Usuário não autenticado', 401);
@@ -149,7 +141,7 @@ export class ComitesController {
     }
   };
 
-  removeMembro = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  removeMembro = async (req: Request, res: Response, next: NextFunction) => {
     try {
       if (!req.user) {
         throw new AppError('Usuário não autenticado', 401);

@@ -2,28 +2,19 @@ import { Request, Response, NextFunction } from 'express';
 import { RelatosAuthService } from './relatos-auth.service';
 import { AppError } from '@middlewares/error-handler';
 
-// Estender o Request para incluir o usuário autenticado
-interface AuthRequest extends Request {
-  user?: {
-    userId: string;
-    email: string;
-    tipo: string;
-  };
-}
-
 export class RelatosAuthController {
   private service: RelatosAuthService;
 
   constructor() {
     this.service = new RelatosAuthService();
   }
-  testLog = (req: AuthRequest, res: Response, next: NextFunction) => {
+  testLog = (req: Request, res: Response, next: NextFunction) => {
     console.log('=== PASSOU AQUI ===');
     console.log('req.user:', req.user);
     next();
   };
 
-  listar = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  listar = async (req: Request, res: Response, next: NextFunction) => {
     try {
       if (!req.user) {
         throw new AppError('Usuário não autenticado', 401);
@@ -48,7 +39,7 @@ export class RelatosAuthController {
     }
   };
 
-  detalhes = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  detalhes = async (req: Request, res: Response, next: NextFunction) => {
     try {
       if (!req.user) {
         throw new AppError('Usuário não autenticado', 401);
@@ -62,7 +53,7 @@ export class RelatosAuthController {
     }
   };
 
-  iniciar = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  iniciar = async (req: Request, res: Response, next: NextFunction) => {
     try {
       if (!req.user) {
         throw new AppError('Usuário não autenticado', 401);
@@ -76,7 +67,7 @@ export class RelatosAuthController {
     }
   };
 
-  addComentario = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  addComentario = async (req: Request, res: Response, next: NextFunction) => {
     try {
         console.log('=== CONTROLLER ADD COMMENT ===');
         console.log('req.user:', req.user);
@@ -99,7 +90,7 @@ export class RelatosAuthController {
     }
   };
 
-  transferir = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  transferir = async (req: Request, res: Response, next: NextFunction) => {
     try {
       if (!req.user) {
         throw new AppError('Usuário não autenticado', 401);
@@ -115,7 +106,7 @@ export class RelatosAuthController {
     }
   };
 
-  responder = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  responder = async (req: Request, res: Response, next: NextFunction) => {
     try {
       if (!req.user) {
         throw new AppError('Usuário não autenticado', 401);
@@ -131,7 +122,7 @@ export class RelatosAuthController {
     }
   };
 
-  finalizar = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  finalizar = async (req: Request, res: Response, next: NextFunction) => {
     try {
       if (!req.user) {
         throw new AppError('Usuário não autenticado', 401);
@@ -145,7 +136,7 @@ export class RelatosAuthController {
     }
   };
 
-  reabrir = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  reabrir = async (req: Request, res: Response, next: NextFunction) => {
     try {
       if (!req.user) {
         throw new AppError('Usuário não autenticado', 401);

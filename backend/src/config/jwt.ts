@@ -47,14 +47,14 @@ export class JWTService {
     if (PRIVATE_KEY) {
       return jwt.sign(payload, PRIVATE_KEY, {
         algorithm: 'RS256',
-        expiresIn: ACCESS_TOKEN_EXPIRATION,
+        expiresIn: ACCESS_TOKEN_EXPIRATION as string,
       });
     }
 
     // Fallback para desenvolvimento (não usar em produção!)
     return jwt.sign(payload, 'dev-secret-key', {
       algorithm: 'HS256',
-      expiresIn: ACCESS_TOKEN_EXPIRATION,
+      expiresIn: ACCESS_TOKEN_EXPIRATION as string,
     });
   }
 
@@ -65,14 +65,14 @@ export class JWTService {
     if (PRIVATE_KEY) {
       return jwt.sign(payload, PRIVATE_KEY, {
         algorithm: 'RS256',
-        expiresIn: REFRESH_TOKEN_EXPIRATION,
+        expiresIn: REFRESH_TOKEN_EXPIRATION as string,
       });
     }
 
     // Fallback para desenvolvimento
     return jwt.sign(payload, 'dev-secret-key', {
       algorithm: 'HS256',
-      expiresIn: REFRESH_TOKEN_EXPIRATION,
+      expiresIn: REFRESH_TOKEN_EXPIRATION as string,
     });
   }
 

@@ -150,13 +150,14 @@ export class AuthController {
   ): Promise<void> => {
     try {
       if (!req.user) {
-        return res.status(401).json({
+        res.status(401).json({
           success: false,
           error: {
             message: 'Não autenticado',
             code: 'NOT_AUTHENTICATED',
           },
         });
+        return;
       }
 
       res.json({

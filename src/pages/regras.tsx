@@ -2,36 +2,50 @@ import { ConditionalHeader } from "@/components/ConditionalHeader"
 import { ExternalLink } from "lucide-react"
 
 const topicos = [
+  
   {
     id: 1,
-    titulo: "POLÍTICA ANTICORRUPÇÃO - CONCEITO GERAL",
-    link: "https://associacaoaliancae.sharepoint.com/sites/AssembleiaGeralAE/Documentos%20Compartilhados/Forms/AllItems.aspx?viewid=c6b908ea%2Dcc29%2D4702%2Dacb0%2D427615aefe17&ga=1&id=%2Fsites%2FAssembleiaGeralAE%2FDocumentos%20Compartilhados%2FGeneral%2F01%2E%20Gest%C3%A3o%2FRegimento%20interno%20e%20pol%C3%ADticas%2FPoliticas%20internas%20base%20RI%2FPol%C3%ADticas%20%2D%20Diagramadas%2FPOL%C3%8DTICA%20ANTICORRUP%C3%87%C3%83O%20DA%20ASSOCIA%C3%87%C3%83O%20%20ALIAN%C3%87A%20EMPREENDEDORA%2Epdf&parent=%2Fsites%2FAssembleiaGeralAE%2FDocumentos%20Compartilhados%2FGeneral%2F01%2E%20Gest%C3%A3o%2FRegimento%20interno%20e%20pol%C3%ADticas%2FPoliticas%20internas%20base%20RI%2FPol%C3%ADticas%20%2D%20Diagramadas",
-    thumbnail: ""
+    titulo: "POLÍTICA DE CORTESIAS",
+    link: "https://aliancaempreendedora.org.br/wp-content/uploads/2025/12/POL%C3%8DTICA%20DE%20CORTESIAS%20DA%20ASSOCIA%C3%87%C3%83O%20ALIAN%C3%87A%20EMPREENDEDORA%20.pdf?_t=1765342389",
+    thumbnail: "https://prod-cms-us-east-1-uploads.s3.us-east-1.amazonaws.com/thumbnail_Anticorrupcao_afd8f2744e.png"
   },
   {
     id: 2,
-    titulo: "PROCESSO DE CONTRATAÇÃO DE TERCEIROS",
-    link: "https://exemplo.com/contratacao-terceiros.pdf",
-    thumbnail: "https://crbasso.com.br/wp-content/uploads/2022/07/Principais-cuidados-nos-processos-de-contratacao-de-terceiros-atualizado-pela-Lei-da-Terceirizacao.jpg"
+    titulo: "POLÍTICA ANTICORRUPÇÃO",
+    link: "https://aliancaempreendedora.org.br/wp-content/uploads/2025/12/POL%C3%8DTICA%20ANTICORRUP%C3%87%C3%83O%20DA%20ASSOCIA%C3%87%C3%83O%20%20ALIAN%C3%87A%20EMPREENDEDORA.pdf?_t=1765342389",
+    thumbnail: ""
   },
   {
     id: 3,
-    titulo: "RELAÇÕES COM AGENTES PÚBLICOS",
-    link: "https://lec.com.br/relacionamento-entre-agentes-publicos-e-a-iniciativa-privada/",
-    thumbnail: "https://lec.com.br/wp-content/uploads/2024/01/senhora-do-escritorio-focada-em-copos-usando-tablet-enquanto-dois-empresarios-maduros-discutindo-o-trabalho-atras-da-parede-de-vidro-copie-o-espaco-conceito-de-comunicacao-1-2048x1365.jpg"
+    titulo: "POLÍTICA DE DOAÇÕES E PATROCÍNIOS",
+    link: "https://aliancaempreendedora.org.br/wp-content/uploads/2025/12/POL%C3%8DTICA%20DE%20DOA%C3%87%C3%95ES%20E%20PATROC%C3%8DNIOS%20DA%20ASSOCIA%C3%87%C3%83O%20ALIAN%C3%87A%20EMPREENDEDORA.pdf?_t=1765342389",
+    thumbnail: "https://prod-cms-us-east-1-uploads.s3.us-east-1.amazonaws.com/thumbnail_Preciso_contratar_um_PJ_o_que_fazer_1_page_0001_a768d9bf65.jpg"
   },
   {
     id: 4,
-    link: "https://associacaoaliancae.sharepoint.com/sites/AssembleiaGeralAE/Documentos%20Compartilhados/Forms/AllItems.aspx?id=%2Fsites%2FAssembleiaGeralAE%2FDocumentos%20Compartilhados%2FGeneral%2F01%2E%20Gest%C3%A3o%2FRegimento%20interno%20e%20pol%C3%ADticas%2FPoliticas%20internas%20base%20RI%2FPol%C3%ADticas%20%2D%20Diagramadas%2FPOL%C3%8DTICA%20DE%20CORTESIAS%20DA%20ASSOCIA%C3%87%C3%83O%20ALIAN%C3%87A%20EMPREENDEDORA%20%2Epdf&parent=%2Fsites%2FAssembleiaGeralAE%2FDocumentos%20Compartilhados%2FGeneral%2F01%2E%20Gest%C3%A3o%2FRegimento%20interno%20e%20pol%C3%ADticas%2FPoliticas%20internas%20base%20RI%2FPol%C3%ADticas%20%2D%20Diagramadas",
-    thumbnail: "https://claglobal.com.br/wp-content/uploads/2024/12/close-up-unrecognizable-man-giving-gift-box-camera-scaled.jpg",
-    titulo: "PRESENTES E CORTESIAS PARA PARCEIROS COMERCIAIS PRIVADOS",
+    titulo: "POLÍTICA DE CONFLITO DE INTERESSES",
+    link: "",
+    thumbnail: ""
   },
   {
     id: 5,
-    titulo: "PRESENTES E CORTESIAS OFERECIDOS POR PARCEIROS COMERCIAIS",
-    link: "https://associacaoaliancae.sharepoint.com/sites/AssembleiaGeralAE/Documentos%20Compartilhados/Forms/AllItems.aspx?id=%2Fsites%2FAssembleiaGeralAE%2FDocumentos%20Compartilhados%2FGeneral%2F01%2E%20Gest%C3%A3o%2FRegimento%20interno%20e%20pol%C3%ADticas%2FPoliticas%20internas%20base%20RI%2FPol%C3%ADticas%20%2D%20Diagramadas%2FPOL%C3%8DTICA%20DE%20CORTESIAS%20DA%20ASSOCIA%C3%87%C3%83O%20ALIAN%C3%87A%20EMPREENDEDORA%20%2Epdf&parent=%2Fsites%2FAssembleiaGeralAE%2FDocumentos%20Compartilhados%2FGeneral%2F01%2E%20Gest%C3%A3o%2FRegimento%20interno%20e%20pol%C3%ADticas%2FPoliticas%20internas%20base%20RI%2FPol%C3%ADticas%20%2D%20Diagramadas",
-    thumbnail: "https://claglobal.com.br/wp-content/uploads/2024/12/close-up-unrecognizable-man-giving-gift-box-camera-scaled.jpg"
+    titulo: "POLÍTICA DE PROTEÇÃO",
+    link: "",
+    thumbnail: "",
+  },
+  {
+    id: 6,
+    titulo: "SAFEGUARDING POLICY",
+    link: "",
+    thumbnail: ""
+  },
+  {
+    id: 7,
+    titulo: "CONSEQUÊNCIAS",
+    link: "",
+    thumbnail: ""
   }
+
 ]
 
 export default function Regras() {
