@@ -11,7 +11,7 @@ const poolConfig: PoolConfig = {
   max: parseInt(process.env.DB_POOL_MAX || '10'),
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 2000,
-  ssl:false
+  ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false
 };
 
 export const pool = new Pool(poolConfig);
@@ -60,6 +60,7 @@ export async function closeDatabaseConnection(): Promise<void> {
     logger.error({ error }, 'Erro ao fechar pool de conexões');
   }
 }
+
 
 
 
