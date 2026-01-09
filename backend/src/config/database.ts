@@ -5,8 +5,7 @@ import { logger } from '@utils/logger';
 console.log('DB_HOST:', process.env.DB_HOST);
 console.log('DB_USER:', process.env.DB_USER);
 console.log('DB_PORT:', process.env.DB_PORT);
-console.log('DB_SSL:', process.env.DB_SSL
-            
+console.log('DB_SSL:', process.env.DB_SSL);    
 console.log('DATABASE_URL exists:', !!process.env.DATABASE_URL);
 
 let poolConfig: PoolConfig;
@@ -83,6 +82,7 @@ export async function closeDatabaseConnection(): Promise<void> {
     logger.error({ error }, 'Erro ao fechar pool de conexões');
   }
 }
+
 
 
 
