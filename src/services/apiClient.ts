@@ -5,8 +5,14 @@ import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'ax
  * Configuração centralizada do Axios com interceptors
  */
 
-// URL base da API - já inclui /api
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+// --- CORREÇÃO AQUI ---
+// Pega a URL do ambiente OU usa localhost
+const envUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+
+// Garante que não tenha barra no final da URL base, e adiciona o /api
+// Isso resolve o problema se você esqueceu de colocar /api na Vercel
+const API_BASE_URL = `${envUrl.replace(/\/$/, '')}/api`; 
+// ---------------------
 
 // Chaves para localStorage
 const ACCESS_TOKEN_KEY = 'canal_access_token';
@@ -163,4 +169,5 @@ export const tokenManager = {
 };
 
 export default apiClient;
+
 
