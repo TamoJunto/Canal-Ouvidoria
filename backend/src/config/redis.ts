@@ -1,4 +1,4 @@
-import { createClient, RedisClientType } from 'redis';
+import { createClient, RedisClientType, RedisClientOptions } from 'redis';
 import { logger } from '@utils/logger';
 
 let redisClient: RedisClientType | null = null;
@@ -22,15 +22,33 @@ export async function connectRedis(): Promise<RedisClientType | null> {
   }
 
   try {
-    redisClient = createClient({
-      socket: {
-        host: process.env.REDIS_HOST || 'localhost',
-        port: parseInt(process.env.REDIS_PORT || '6379'),
-        connectTimeout: 5000, // Timeout de 5 segundos
-      },
-      password: process.env.REDIS_PASSWORD || undefined,
-      database: parseInt(process.env.REDIS_DB || '0'),
-    });
+    // --- MUDANÇA AQUI: Suporte para REDIS_URL (Render/Upstash) ---
+    let connectionOptions: RedisClientOptions;
+
+    if (process.env.REDIS_URL) {
+      // Se tiver a URL completa (padrão Render/Upstash)
+      connectionOptions = {
+        url: process.env.REDIS_URL,
+        socket: {
+          connectTimeout: 10000, // Timeout maior para garantir conexão externa
+          tls: process.env.REDIS_URL.startsWith('rediss://') // Ativa TLS se for rediss
+        }
+      };
+    } else {
+      // Padrão antigo (Localhost ou variáveis separadas)
+      connectionOptions = {
+        socket: {
+          host: process.env.REDIS_HOST || 'localhost',
+          port: parseInt(process.env.REDIS_PORT || '6379'),
+          connectTimeout: 5000,
+        },
+        password: process.env.REDIS_PASSWORD || undefined,
+        database: parseInt(process.env.REDIS_DB || '0'),
+      };
+    }
+
+    redisClient = createClient(connectionOptions) as RedisClientType;
+    // -------------------------------------------------------------
 
     redisClient.on('error', (err) => {
       logger.error({ err }, 'Erro no cliente Redis');
@@ -308,7 +326,3 @@ export class RedisService {
     }
   }
 }
-
-
-
-
