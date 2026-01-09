@@ -1,5 +1,8 @@
 import nodemailer from 'nodemailer';
 import { logger } from '@utils/logger';
+import dns from 'dns';
+
+dns.setDefaultResultOrder('ipv4first');
 
 export interface EmailConfig {
   host: string;
@@ -135,3 +138,4 @@ export const emailDefaults = {
   replyTo: process.env.EMAIL_REPLY_TO || 'ouvidoria@empresa.com.br',
   frontendUrl: process.env.FRONTEND_URL || 'http://localhost:3002',
 };
+
