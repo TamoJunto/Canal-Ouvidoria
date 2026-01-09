@@ -1,6 +1,12 @@
 import { Pool, PoolConfig } from 'pg';
 import { logger } from '@utils/logger';
 
+// DEBUG: Log das variáveis de ambiente
+console.log('DB_HOST:', process.env.DB_HOST);
+console.log('DB_USER:', process.env.DB_USER);
+console.log('DB_PORT:', process.env.DB_PORT);
+console.log('DB_SSL:', process.env.DB_SSL);
+
 const poolConfig: PoolConfig = {
   host: process.env.DB_HOST || 'localhost',
   port: parseInt(process.env.DB_PORT || '5432'),
@@ -60,6 +66,7 @@ export async function closeDatabaseConnection(): Promise<void> {
     logger.error({ error }, 'Erro ao fechar pool de conexões');
   }
 }
+
 
 
 
