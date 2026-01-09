@@ -9,17 +9,26 @@ export interface EmailConfig {
     user: string;
     pass: string;
   };
+  // Adicionei isso para evitar erro de TS
+  tls?: {
+    rejectUnauthorized: boolean;
+  };
 }
 
-// Configuração para produção (usar variáveis de ambiente)
+// Configuração para produção
 const productionConfig: EmailConfig = {
   host: process.env.SMTP_HOST || 'smtp.gmail.com',
-  port: parseInt(process.env.SMTP_PORT || '587'),
+  // Mudei o fallback para 465, que é o ideal para SSL
+  port: parseInt(process.env.SMTP_PORT || '465'),
   secure: process.env.SMTP_SECURE === 'true',
   auth: {
     user: process.env.SMTP_USER || '',
     pass: process.env.SMTP_PASS || '',
   },
+  // ISSO AQUI QUE CONSERTA O TIMEOUT:
+  tls: {
+    rejectUnauthorized: false
+  }
 };
 
 // Cache do transporter
@@ -89,11 +98,13 @@ export async function getEmailTransporter(): Promise<nodemailer.Transporter> {
     if (!productionConfig.auth.user || !productionConfig.auth.pass) {
       logger.warn('Credenciais SMTP não configuradas! Emails não serão enviados.');
       
-      // Retorna transporter fake que não envia nada
       transporter = nodemailer.createTransport({
         jsonTransport: true,
       });
     } else {
+      // Log para debug (sem mostrar a senha)
+      console.log(`🔌 Conectando ao SMTP: ${productionConfig.host}:${productionConfig.port} (Secure: ${productionConfig.secure})`);
+      
       transporter = nodemailer.createTransport(productionConfig);
       logger.info('Email transporter configurado com SMTP de produção');
     }
