@@ -5,6 +5,13 @@ let redisClient: RedisClientType | null = null;
 let useMemoryFallback = false;
 
 export async function connectRedis(): Promise<RedisClientType | null> {
+  
+  if (process.env.REDIS_DISABLED === 'true') {
+    logger.info('ℹ️ Redis desabilitado. Usando fallback em memória.');
+    useMemoryFallback = true;
+    return null;
+  }
+  
   if (redisClient) {
     return redisClient;
   }
@@ -301,6 +308,7 @@ export class RedisService {
     }
   }
 }
+
 
 
 
