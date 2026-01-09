@@ -5,20 +5,37 @@ import { logger } from '@utils/logger';
 console.log('DB_HOST:', process.env.DB_HOST);
 console.log('DB_USER:', process.env.DB_USER);
 console.log('DB_PORT:', process.env.DB_PORT);
-console.log('DB_SSL:', process.env.DB_SSL);
+console.log('DB_SSL:', process.env.DB_SSL
+            
+console.log('DATABASE_URL exists:', !!process.env.DATABASE_URL);
 
-const poolConfig: PoolConfig = {
-  host: process.env.DB_HOST || 'localhost',
-  port: parseInt(process.env.DB_PORT || '5432'),
-  database: process.env.DB_NAME || 'canal_ouvidoria',
-  user: process.env.DB_USER || 'postgres',
-  password: process.env.DB_PASSWORD || 'postgres',
-  min: parseInt(process.env.DB_POOL_MIN || '2'),
-  max: parseInt(process.env.DB_POOL_MAX || '10'),
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
-  ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false
-};
+let poolConfig: PoolConfig;
+
+if (process.env.DATABASE_URL) {
+  // Usar connection string direta
+  poolConfig = {
+    connectionString: process.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false },
+    min: 2,
+    max: 10,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 5000,
+  };
+} else {
+  // Fallback para variáveis individuais
+  poolConfig = {
+    host: process.env.DB_HOST || 'localhost',
+    port: parseInt(process.env.DB_PORT || '5432'),
+    database: process.env.DB_NAME || 'canal_ouvidoria',
+    user: process.env.DB_USER || 'postgres',
+    password: process.env.DB_PASSWORD || 'postgres',
+    min: 2,
+    max: 10,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 5000,
+    ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false
+  };
+}
 
 export const pool = new Pool(poolConfig);
 
@@ -66,6 +83,7 @@ export async function closeDatabaseConnection(): Promise<void> {
     logger.error({ error }, 'Erro ao fechar pool de conexões');
   }
 }
+
 
 
 
