@@ -33,7 +33,6 @@ export class EmailService {
       const fromAddress = `"${emailDefaults.from.name}" <${emailDefaults.from.address}>`;
 
       // --- 🚀 MODO PRODUÇÃO: API RESEND (HTTP/443) ---
-      // Isso evita o bloqueio de porta SMTP do Render
       if (process.env.NODE_ENV === 'production') {
         logger.info(`Tentando enviar email via API Resend para: ${toAddress}`);
 
@@ -41,10 +40,10 @@ export class EmailService {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${process.env.SMTP_PASS}` // Sua chave re_123...
+            'Authorization': `Bearer ${process.env.SMTP_PASS}`
           },
           body: JSON.stringify({
-            from: 'onboarding@resend.dev', // Força o remetente padrão do Resend Grátis
+            from: 'onboarding@resend.dev',
             to: options.to,
             subject: options.subject,
             html: options.html,
@@ -59,7 +58,9 @@ export class EmailService {
           throw new Error(`Falha API Resend: ${errorText}`);
         }
 
-        const data = await response.json();
+        // --- CORREÇÃO AQUI: Dizendo ao TS que o retorno tem um ID ---
+        const data = await response.json() as { id: string };
+        
         logger.info({ id: data.id }, '✅ Email enviado via API Resend (HTTP 443)');
 
         return {
@@ -110,7 +111,7 @@ export class EmailService {
     }
   }
 
-  // --- MÉTODOS DE NEGÓCIO (Não mudaram nada, apenas chamam o send acima) ---
+  // --- MÉTODOS DE NEGÓCIO ---
 
   async sendMagicLink(data: { email: string; nome: string; token: string; ip: string; }) {
     const magicLink = `${emailDefaults.frontendUrl}/auth/verify?token=${data.token}`;
