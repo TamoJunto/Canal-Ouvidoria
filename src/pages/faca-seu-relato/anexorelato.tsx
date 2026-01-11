@@ -78,7 +78,7 @@ export default function AnexosPage() {
               <div className="flex-1 space-y-6">
                 <div className=" gap-4 mb-4">
                   <div className="border-2 border-dashed border-muted rounded-xl p-6 text-center">
-                    <Upload className="mx-auto mb-2 text-muted-foreground" size={40} />
+                    <Upload className="mx-auto mb-2 text-white" size={40} />
                     <p className="text-white text-sm mb-4 houv">
                       Arraste e Solte um arquivo ou clique para selecionar
                     </p>
