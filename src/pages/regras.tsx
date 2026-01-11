@@ -24,25 +24,25 @@ const topicos = [
   {
     id: 4,
     titulo: "POLÍTICA DE CONFLITO DE INTERESSES",
-    link: "",
+    link: "https://aliancaempreendedora.org.br/wp-content/uploads/2025/12/POL%C3%8DTICA%20DE%20CONFLITO%20DE%20INTERESSES%20DA%20ASSOCIA%C3%87%C3%83O%20ALIAN%C3%87A%20EMPREENDEDORA%20.pdf?_t=1765342389",
     thumbnail: ""
   },
   {
     id: 5,
     titulo: "POLÍTICA DE PROTEÇÃO",
-    link: "",
+    link: "https://aliancaempreendedora.org.br/wp-content/uploads/2025/12/POL%C3%8DTICA%20DE%20PROTE%C3%87%C3%83O%20%28SAFEGUARDING%20POLICY%29.pdf?_t=1765342389",
     thumbnail: "",
   },
   {
     id: 6,
     titulo: "SAFEGUARDING POLICY",
-    link: "",
+    link: "https://aliancaempreendedora.org.br/wp-content/uploads/2025/12/SAFEGUARDING%20POLICY_ENGLISH.pdf?_t=1765342389",
     thumbnail: ""
   },
   {
     id: 7,
     titulo: "CONSEQUÊNCIAS",
-    link: "",
+    link: "https://aliancaempreendedora.org.br/wp-content/uploads/2025/12/CONSEQU%C3%8ANCIAS.pdf?_t=1765342389",
     thumbnail: ""
   }
 
