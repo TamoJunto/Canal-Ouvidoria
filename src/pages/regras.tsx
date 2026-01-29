@@ -7,7 +7,7 @@ const topicos = [
     id: 1,
     titulo: "POLÍTICA DE CORTESIAS",
     link: "https://aliancaempreendedora.org.br/wp-content/uploads/2025/12/POL%C3%8DTICA%20DE%20CORTESIAS%20DA%20ASSOCIA%C3%87%C3%83O%20ALIAN%C3%87A%20EMPREENDEDORA%20.pdf?_t=1765342389",
-    thumbnail: "https://prod-cms-us-east-1-https://prod-cms-us-east-1-uploads.s3.us-east-1.amazonaws.com/1_dae0517a05.png"
+    thumbnail: "https://prod-cms-us-east-1-uploads.s3.us-east-1.amazonaws.com/1_2a4f0f3b0b.png"
   },
   {
     id: 2,
