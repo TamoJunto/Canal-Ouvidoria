@@ -28,7 +28,7 @@ export default function CodigoDeEtica() {
           <div className="bg-muted rounded-xl p-8 min-h-[400px] flex items-center justify-center">
             
           <iframe
-              src="https://associacaoaliancae.sharepoint.com/sites/AssembleiaGeralAE/_layouts/15/embed.aspx?UniqueId=8ce7d9d2-0395-4d5c-ae01-8a5abbc1c762"
+              src="https://prod-cms-us-east-1-uploads.s3.us-east-1.amazonaws.com/Codigo_de_Conduta_Alianca_Empreendedora_e58cb5dabd.pdf"
               width="100%"
               height="600"
               frameBorder="0"

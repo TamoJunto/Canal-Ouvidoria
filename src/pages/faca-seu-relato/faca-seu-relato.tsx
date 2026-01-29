@@ -194,9 +194,9 @@ export default function FacaSeuRelato() {
               {identificar === "nao" && (
                 <>
                   <div className="space-y-1 text-white text-sm leading-relaxed">
-                    <p>
-                    Para receber atualizações sobre seu relato, agora você pode inserir um e-mail ou telefone e permanecer anônimo. 
-                    Dessa maneira, a empresa não receberá os seus dados de identificação, que serão utilizados pela Contato Seguro exclusivamente para envio de notificações. 
+                    <p className="text-justify">
+                    Para receber atualizações sobre seu relato, agora você pode inserir um e-mail e permanecer anônimo. 
+                    Dessa maneira, a empresa não receberá os seus dados de identificação, que serão utilizados pela Alinça Empreendedora exclusivamente para envio de notificações. 
                     O preenchimento destes campos não é obrigatório, mas facilita a comunicação entre você e a empresa.
 
                     </p>
@@ -283,7 +283,7 @@ export default function FacaSeuRelato() {
               <div className="space-y-3">
                 <Label className="text-white text-sm font-medium">Sobre o que você gostaria de falar/relatar?</Label>
                 <Textarea
-                  placeholder="Descreva a sua denúncia de forma clara e direta (mínimo 10 caracteres)..."
+                  placeholder="Descreva a sua denúncia de forma direta (mínimo 10 caracteres)..."
                   className="bg-white border-0 text-foreground min-h-[100px] resize-none"
                   value={descricaoRelato}
                   onChange={(e) => setDescricaoRelato(e.target.value)}
@@ -351,7 +351,7 @@ export default function FacaSeuRelato() {
                   <button type="button" onClick={() => setShowLgpdModal(true)} className="underline hover:text-accent">
                     lgpd@aliancaempreendedora.org.br
                   </button>
-                  . E um box "Li e concordo com o termo acima
+              
                 </p>
 
                 <div className="flex items-start gap-3">
@@ -419,7 +419,7 @@ export default function FacaSeuRelato() {
             <DialogTitle className="text-2xl font-bold text-accent">Política de proteção de dados</DialogTitle>
           </DialogHeader>
           <div className="space-y-6 text-sm leading-relaxed">
-            <p>
+            <p className="text-justify">
               O responsável pelo tratamento de dados pessoais, com finalidade de gerenciar a denúncia apresentada
               referente a irregularidades relacionadas às políticas, códigos e normativas de atuação corporativas
               definidas pela Aliança Empreendedora, será a própria Aliança Empreendedora, podendo compartilhar as
@@ -431,11 +431,11 @@ export default function FacaSeuRelato() {
               <h3 className="font-bold text-lg mb-2">
                 1. Quem é o responsável pelo tratamento dos seus dados pessoais?
               </h3>
-              <p>
+              <p className="text-justify">
                 A Aliança Empreendedora, uma organização com sede em Curitiba – PR, é a responsável pelo tratamento dos
                 dados pessoais recebidos através do canal de denúncias interno (doravante, o "Canal").
               </p>
-              <p className="mt-2">
+              <p className="mt-2 text-justify">
                 A Aliança Empreendedora respeita os direitos e liberdades fundamentais das pessoas, entre os quais o
                 direito à proteção de dados pessoais. A privacidade dos(as) denunciantes, denunciados(as) e testemunhas,
                 é um pilar básico para a organização, que trata seus dados pessoais com extremo respeito à legislação
