@@ -83,6 +83,16 @@ export default function AnexosPage() {
                       Arraste e Solte um arquivo ou clique para selecionar
                     </p>
 
+                    <div className="bg-white/10 rounded-lg p-4 mb-4">
+                      <p className="text-white text-sm">Formatos aceitos:</p>
+                      <p className="text-white text-xs">PDF, JPG, JPEG, PNG, MP4, M4V, AVI, MPG, MPEG, GIF, TIF, MP3, WAV, M4A, OPUS e OGG</p>
+                      <p className="text-white/90 text-xs font-medium mb-1">Limites:</p>
+                      <p className="text-white/70 text-xs">
+                        • Tamanho máximo por arquivo: <strong className="text-white">25MB</strong><br />
+                        • Máximo de arquivos: <strong className="text-white">10 arquivos</strong><br />
+                        • Tamanho total máximo: <strong className="text-white">100MB</strong>
+                      </p>
+                    </div>
 
                     <input type="file"
                     multiple

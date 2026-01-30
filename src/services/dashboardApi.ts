@@ -120,7 +120,10 @@ export async function getDashboardResumo(
       delete backendFilters.tipoOcorrencia;
     }
     
-    const data = await getDashboard(backendFilters);
+    const [data, tempoMedioData] = await Promise.all([
+      getDashboard(backendFilters),
+      getTempoMedio().catch(() => null)
+      ]);
     
     return {
       kpis: {
@@ -128,6 +131,10 @@ export async function getDashboardResumo(
         novos: data.kpis.novos,
         emAndamento: data.kpis.em_andamento,
         finalizados: data.kpis.finalizados,
+        tempoMedioAtendimento: tempoMedioData ? {
+          dias: tempoMedioData,
+          totalFinalizados: data.kpis.finalizados,
+        } : undefined,
         variacaoTotal: { percentual: 0, periodo: 'mensal' },
         variacaoNovos: { percentual: 0, periodo: 'mensal' },
         variacaoEmAndamento: { percentual: 0, periodo: 'mensal' },

@@ -2,7 +2,7 @@ import { useMemo, useState } from "react"
 import { HeaderAdmin } from "@/components/headerAdmin"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Download, Calendar as CalendarIcon, BarChart3, TrendingUp, TrendingDown, Loader2, X, ChevronLeft, Filter, FileSpreadsheet, FileJson, FileText, ChevronDown } from "lucide-react"
+import { Download, Calendar as CalendarIcon, BarChart3, TrendingUp, TrendingDown, Loader2, X, ChevronLeft, Filter, FileSpreadsheet, FileJson, FileText, ChevronDown, Clock } from "lucide-react"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 import { useDashboard } from "@/hooks/useDashboard"
 import type { DashboardPeriod } from "@/types/dashboard"
@@ -11,6 +11,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar"
 import type { DateRange as DateRangeType } from "react-day-picker"
 import { useNavigate } from "react-router-dom"
+
 
 export default function DashboardPage() {
   const navigate = useNavigate()
@@ -434,7 +435,7 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-4 gap-6 mb-8">
+            <div className="grid grid-cols-5 gap-6 mb-8">
               {/* Total de Relatos */}
               <div className="bg-white rounded-2xl p-6">
                 <div className="flex items-start gap-4">
@@ -589,6 +590,37 @@ export default function DashboardPage() {
                             {data.kpis.variacaoFinalizados.periodo})
                           </div>
                         )}
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+              {/* Tempo Médio de Atendimento */}
+              <div className="bg-white rounded-2xl p-6">
+                <div className="flex items-start gap-4">
+                  <div className="bg-purple-50 p-3 rounded-full">
+                    <Clock className="h-6 w-6 text-purple-500" />
+                  </div>
+                  <div className="flex-1">
+                    {loading ? (
+                      <>
+                        <Skeleton className="h-10 w-16 mb-2" />
+                        <Skeleton className="h-4 w-24 mb-2" />
+                        <Skeleton className="h-3 w-20" />
+                      </>
+                    ) : (
+                      <>
+                        <div className="text-4xl font-bold">
+                          {data?.kpis.tempoMedioAtendimento?.dias !== null && data?.kpis.tempoMedioAtendimento?.dias !== undefined
+                            ? `${data.kpis.tempoMedioAtendimento.dias.toFixed(1)}`
+                            : "-"}
+                        </div>
+                        <div className="text-sm text-muted-foreground mt-1">Tempo Médio (dias)</div>
+                        <div className="text-xs text-muted-foreground mt-2">
+                          {data?.kpis.tempoMedioAtendimento?.totalFinalizados 
+                            ? `Base: ${data.kpis.tempoMedioAtendimento.totalFinalizados} relatos finalizados`
+                            : "Nenhum relato finalizado"}
+                        </div>
                       </>
                     )}
                   </div>

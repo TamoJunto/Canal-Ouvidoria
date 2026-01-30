@@ -303,6 +303,18 @@ export default function FacaSeuRelato() {
                 />
               </div>
 
+
+              {/* Conhecimento dos Fatos */}
+              <div className="space-y-3">
+                <Label className="text-white text-sm font-medium">
+                  Além de você, quem mais tem conhecimento dos fatos?;
+                </Label>
+                <Textarea
+                  placeholder="Descreva quem mais tem conhecimento dos fatos..."
+                  className="bg-white border-0 text-foreground min-h-[80px] resize-none"
+                />
+              </div>
+              
               {/* Evidências */}
               <div className="space-y-3">
                 <Label className="text-white text-base font-medium">Possui evidências?</Label>
@@ -326,17 +338,6 @@ export default function FacaSeuRelato() {
                     Após clicar em "Prosseguir" ao final do preenchimento do Relato, solicitamos que você anexe ao registro as evidências que possui
                   </p>
                 )}
-              </div>
-
-              {/* Conhecimento dos Fatos */}
-              <div className="space-y-3">
-                <Label className="text-white text-sm font-medium">
-                  Além de você, quem mais tem conhecimento dos fatos?;
-                </Label>
-                <Textarea
-                  placeholder="Descreva quem mais tem conhecimento dos fatos..."
-                  className="bg-white border-0 text-foreground min-h-[80px] resize-none"
-                />
               </div>
 
               {/* LGPD */}

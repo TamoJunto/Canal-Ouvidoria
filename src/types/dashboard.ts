@@ -7,6 +7,10 @@ export interface DashboardKPI {
   novos: number
   emAndamento: number
   finalizados: number
+  tempoMedioAtendimento?:{
+    dias: number | null
+    totalFinalizados: number
+  }
   variacaoTotal: {
     percentual: number
     periodo: string
