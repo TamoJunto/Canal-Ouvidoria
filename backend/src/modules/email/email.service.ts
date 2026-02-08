@@ -43,7 +43,7 @@ export class EmailService {
             'Authorization': `Bearer ${process.env.SMTP_PASS}`
           },
           body: JSON.stringify({
-            process.env.SMTP_FROM_ADDRESS || emailDefaults.from.address,
+            from: process.env.SMTP_FROM_ADDRESS || emailDefaults.from.address,
             to: options.to,
             subject: options.subject,
             html: options.html,
@@ -146,4 +146,5 @@ export class EmailService {
 }
 
 export const emailService = new EmailService();
+
 
