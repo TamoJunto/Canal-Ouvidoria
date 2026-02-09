@@ -15,7 +15,7 @@ export function HeaderAdmin() {
       try {
         const userData = await authApi.getMe()
         // Pega o nome ou email do usuário
-        setUserName(userData.nome || userData.email)
+        setUserName(userData.nome)
       } catch (error) {
         console.error("Erro ao buscar dados do usuário:", error)
         setUserName("Usuário")
