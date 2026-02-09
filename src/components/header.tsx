@@ -167,25 +167,28 @@ export function Header() {
             </Button>
 
             {message && (
-              <div
-                className={`flex items-start gap-3 p-4 rounded-lg border ${
-                  messageType === 'success'
-                    ? 'bg-green-50 border-green-200'
-                    : 'bg-red-50 border-red-200'
-                }`}
-              >
-                {messageType === 'success' ? (
-                  <CheckCircle2 className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
-                ) : (
-                  <AlertCircle className="h-5 w-5 text-red-600 mt-0.5 flex-shrink-0" />
-                )}
-                <p className={`text-sm leading-relaxed ${
-                  messageType === 'success' ? 'text-green-800' : 'text-red-800'
-                }`}>
-                  {message}
-                </p>
-              </div>
-            )}
+                <div
+                  className={`flex items-start gap-3 p-4 rounded-lg border ${
+                    messageType === 'success'
+                      ? 'bg-green-50 border-green-200'
+                      : 'bg-red-50 border-red-200'
+                  }`}
+                >
+                  {messageType === 'success' ? (
+                    <CheckCircle2 className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
+                  ) : (
+                    <AlertCircle className="h-5 w-5 text-red-600 mt-0.5 flex-shrink-0" />
+                  )}
+                  <p className={`text-sm leading-relaxed ${
+                    messageType === 'success' ? 'text-green-800' : 'text-red-800'
+                  }`}>
+                    {messageType === 'success' 
+                      ? 'Link enviado com sucesso! Verifique sua caixa de entrada.'
+                      : message
+                    }
+                  </p>
+                </div>
+              )}
             
             {magicLink && (
               <div className="flex flex-col gap-3 p-4 rounded-lg bg-blue-50 border border-blue-200">

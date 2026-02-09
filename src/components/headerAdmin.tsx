@@ -1,11 +1,30 @@
 import { Button } from "@/components/ui/button"
 import { FileText, Users, UsersRound, TrendingUp } from "lucide-react"
 import { Link, useNavigate } from "react-router-dom"
+import { useState, useEffect } from "react"
+import { authApi } from "@/services"
 
 
 export function HeaderAdmin() {
   const navigate = useNavigate()
+  const [userName, setUserName] = useState("Carregando...")
   
+  // Buscar dados do usuário ao carregar o componente
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const userData = await authApi.getMe()
+        // Pega o nome ou email do usuário
+        setUserName(userData.nome || userData.email)
+      } catch (error) {
+        console.error("Erro ao buscar dados do usuário:", error)
+        setUserName("Usuário")
+      }
+    }
+    
+    fetchUserData()
+  }, [])
+
   return (
     <header className="w-full py-6 px-8 bg-background">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -49,7 +68,7 @@ export function HeaderAdmin() {
             <div className="w-10 h-10 rounded-full bg-foreground flex items-center justify-center">
               <Users className="w-5 h-5 text-background" />
             </div>
-            <span className="text-sm font-medium text-foreground">usuario</span>
+            <span className="text-sm font-medium text-foreground">{userName}</span>
           </div>
           <Button 
             onClick={() => navigate("/")}
